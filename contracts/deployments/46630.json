@@ -96,5 +96,6 @@
   "stylusRiskEngine": "0x4b7c8bd51abda2ccf421312094e368895c8953f0",
   "stylusCalendar": "0x0735725103ac33a4ed1c4919539c01139703c6ad",
   "stylusOracleRouter": "0x2fc6e9895772017d769b3e6f7680f90ff7a154e7",
-  "keeper": "0x319a9B7EA619Dd52c799209c111A5c348c9a3957"
+  "keeper": "0x319a9B7EA619Dd52c799209c111A5c348c9a3957",
+  "deployedBlock": 127673194
 }

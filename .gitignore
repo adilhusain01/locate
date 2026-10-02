@@ -36,3 +36,9 @@ stylus/target/
 contracts/broadcast/
 # keeper run records
 apps/keepers/runs/
+
+# keeper state
+apps/keepers/runs/
+# ponder
+apps/indexer/.ponder/
+apps/indexer/generated/

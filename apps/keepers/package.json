@@ -4,10 +4,14 @@
   "type": "module",
   "scripts": {
     "mirror": "node src/price-mirror.ts",
-    "mirror:once": "node src/price-mirror.ts --once"
+    "mirror:once": "node src/price-mirror.ts --once",
+    "liquidator": "node src/liquidator.ts",
+    "monitor": "node src/monitor.ts",
+    "monitor:once": "node src/monitor.ts --once"
   },
   "dependencies": {
-    "viem": "^2.37.0"
+    "viem": "^2.37.0",
+    "@locate/sdk": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "^24.0.0",
