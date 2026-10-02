@@ -6,10 +6,13 @@ const RESTRICTED = new Set(["US", "CA", "GB", "CH"]);
 
 export function proxy(request: NextRequest) {
   const country = request.headers.get("x-vercel-ip-country") ?? request.headers.get("cf-ipcountry") ?? "";
-  if (RESTRICTED.has(country.toUpperCase()) && !request.nextUrl.pathname.startsWith("/restricted")) {
-    return NextResponse.rewrite(new URL("/restricted", request.url));
+  const acknowledged = request.cookies.get("locate_ack")?.value === "1";
+  if (RESTRICTED.has(country.toUpperCase()) && !acknowledged) {
+    const url = new URL("/restricted", request.url);
+    url.searchParams.set("next", request.nextUrl.pathname);
+    return NextResponse.redirect(url);
   }
   return NextResponse.next();
 }
 
-export const config = { matcher: ["/((?!_next|favicon.ico|.*\\..*).*)"] };
+export const config = { matcher: ["/app/:path*"] };

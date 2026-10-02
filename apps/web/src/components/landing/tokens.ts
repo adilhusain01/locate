@@ -1,0 +1,40 @@
+/// Diagram and ticket tokens, the same values as globals.css. Diagrams use at most two accent elements each.
+export const T = {
+  paper: "#f4f5f3",
+  paper2: "#ffffff",
+  ink: "#141a1f",
+  muted: "#5b6470",
+  soft: "#8a93a0",
+  rule: "#d5d9dd",
+  accent: "#1e3fae",
+  accentTint: "#e6ebfa",
+  lend: "#176b4d",
+  lendTint: "#e3f1ea",
+  short: "#a33a2f",
+  shortTint: "#f6e6e3",
+} as const;
+
+/// Orthogonal connector, horizontal first, with a rounded elbow (r = 8).
+export function hv(x1: number, y1: number, x2: number, y2: number, r = 8) {
+  if (y1 === y2 || x1 === x2) return `M${x1} ${y1} L${x2} ${y2}`;
+  const dx = Math.sign(x2 - x1);
+  const dy = Math.sign(y2 - y1);
+  return `M${x1} ${y1} L${x2 - dx * r} ${y1} Q${x2} ${y1} ${x2} ${y1 + dy * r} L${x2} ${y2}`;
+}
+
+/// Orthogonal connector, vertical first, with a rounded elbow (r = 8).
+export function vh(x1: number, y1: number, x2: number, y2: number, r = 8) {
+  if (y1 === y2 || x1 === x2) return `M${x1} ${y1} L${x2} ${y2}`;
+  const dx = Math.sign(x2 - x1);
+  const dy = Math.sign(y2 - y1);
+  return `M${x1} ${y1} L${x1} ${y2 - dy * r} Q${x1} ${y2} ${x1 + dx * r} ${y2} L${x2} ${y2}`;
+}
+
+/// Horizontal, then vertical, then horizontal: for two nodes on different rows that need a clean entry.
+export function hvh(x1: number, y1: number, x2: number, y2: number, xm: number, r = 8) {
+  if (y1 === y2) return `M${x1} ${y1} L${x2} ${y2}`;
+  const dy = Math.sign(y2 - y1);
+  const d1 = Math.sign(xm - x1);
+  const d2 = Math.sign(x2 - xm);
+  return `M${x1} ${y1} L${xm - d1 * r} ${y1} Q${xm} ${y1} ${xm} ${y1 + dy * r} L${xm} ${y2 - dy * r} Q${xm} ${y2} ${xm + d2 * r} ${y2} L${x2} ${y2}`;
+}

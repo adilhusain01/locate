@@ -6,12 +6,12 @@ import { cn } from "@/lib/utils";
 import { ConnectButton } from "./connect-button";
 
 const links = [
-  { href: "/", label: "Markets" },
-  { href: "/lend", label: "Lend" },
-  { href: "/short", label: "Short" },
-  { href: "/portfolio", label: "Portfolio" },
-  { href: "/auctions", label: "Auctions" },
-  { href: "/faucet", label: "Faucet" },
+  { href: "/app", label: "Markets" },
+  { href: "/app/lend", label: "Lend" },
+  { href: "/app/short", label: "Short" },
+  { href: "/app/portfolio", label: "Portfolio" },
+  { href: "/app/auctions", label: "Auctions" },
+  { href: "/app/faucet", label: "Faucet" },
 ];
 
 export function Nav() {
@@ -23,9 +23,10 @@ export function Nav() {
           <Link href="/" className="shrink-0 text-base font-semibold tracking-tight">
             Locate
           </Link>
+          <span className="hidden text-xs text-muted-foreground sm:inline">Robinhood Chain testnet</span>
           <nav className="-mx-1 flex gap-1 overflow-x-auto px-1 text-sm">
             {links.map((l) => {
-              const active = l.href === "/" ? pathname === "/" : pathname.startsWith(l.href);
+              const active = l.href === "/app" ? pathname === "/app" : pathname.startsWith(l.href);
               return (
                 <Link
                   key={l.href}
