@@ -2,7 +2,7 @@
 
 Locate is an on-chain stock lending and borrowing market for tokenized stocks, built first for Robinhood Chain Stock Tokens. Holders lend tokens they already own and earn a fee in USDG. Borrowers post USDG collateral and take tokens to short, hedge, market-make or arbitrage. The protocol is non-custodial and has no token.
 
-Status: in development. Target network is Robinhood Chain testnet (chain id 46630), with an Arbitrum Sepolia mirror. Mainnet is read-only for now (fork tests and the price mirror).
+Status: live on Robinhood Chain testnet (chain id 46630) since 2 October 2026 with 14 markets, nine mocks and five real faucet Stock Tokens. Addresses in `docs/deployments.md`. Mainnet is read-only (fork tests and the price mirror).
 
 ## How it works
 
@@ -61,11 +61,22 @@ cd stylus
 cargo stylus check --endpoint "$ROBINHOOD_TESTNET_RPC_URL"
 ```
 
-Web app:
+Web app (`apps/web`, Next.js 16, shadcn, wagmi, Privy optional):
 
 ```bash
+cp apps/web/.env.example apps/web/.env.local   # NEXT_PUBLIC_PRIVY_APP_ID is optional; without it injected wallets are used
 pnpm web:dev
 ```
+
+Indexer (`apps/indexer`, Ponder 0.17, GraphQL at `/graphql`, borrow-rate feed at `/markets`):
+
+```bash
+cd apps/indexer && pnpm dev     # pglite locally; set DATABASE_URL for Postgres
+```
+
+Keepers (`apps/keepers`): price mirror, liquidation keeper and health monitor, each with run records. See `apps/keepers/README.md` for the one-shot commands and the systemd units.
+
+Scripts (`scripts/`): `pull-registry.ts` (mainnet Stock Token registry and feeds), `make-testnet-config.ts` (market config), `configure-stylus.ts` and `diff-check.ts` (Stylus setup and the differential check against the Solidity reference).
 
 Deployment addresses per network are kept in `docs/deployments.md`.
 
