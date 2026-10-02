@@ -36,6 +36,9 @@ abstract contract LocateDeployer {
         string name;
         uint256 price8; // 8-decimal USD price per raw token, as on mainnet
         string tier;
+        address token; // zero for a mock to deploy, else an existing Stock Token on this chain
+        uint256 lendSeed; // raw units the owner deposits as first lender (mocks: LENDER_SEED_TOKENS)
+        uint256 poolSeed; // raw units the owner puts into the Uniswap pool (mocks: worth SEED_USDG_PER_MARKET)
     }
 
     struct Deployment {
@@ -65,13 +68,40 @@ abstract contract LocateDeployer {
         string[] memory names = vmDeployer.parseJsonStringArray(json, ".names");
         string[] memory prices = vmDeployer.parseJsonStringArray(json, ".prices8");
         string[] memory tiers = vmDeployer.parseJsonStringArray(json, ".tiers");
-        markets = new MarketConfig[](tickers.length);
+        string[] memory realTickers = vmDeployer.parseJsonStringArray(json, ".real.tickers");
+        address[] memory realTokens = vmDeployer.parseJsonAddressArray(json, ".real.tokens");
+        string[] memory realPrices = vmDeployer.parseJsonStringArray(json, ".real.prices8");
+        string[] memory realLendSeeds = vmDeployer.parseJsonStringArray(json, ".real.lendSeed");
+        string[] memory realPoolSeeds = vmDeployer.parseJsonStringArray(json, ".real.poolSeed");
+
+        // real tokens only exist on the chain they were issued on; skip them anywhere else (local tests)
+        uint256 realCount;
+        for (uint256 i; i < realTokens.length; ++i) {
+            if (realTokens[i].code.length > 0) realCount++;
+        }
+        markets = new MarketConfig[](tickers.length + realCount);
         for (uint256 i; i < tickers.length; ++i) {
             markets[i] = MarketConfig({
                 ticker: tickers[i],
                 name: names[i],
                 price8: vmDeployer.parseUint(prices[i]),
-                tier: tiers[i]
+                tier: tiers[i],
+                token: address(0),
+                lendSeed: LENDER_SEED_TOKENS,
+                poolSeed: 0
+            });
+        }
+        uint256 k = tickers.length;
+        for (uint256 i; i < realTokens.length; ++i) {
+            if (realTokens[i].code.length == 0) continue;
+            markets[k++] = MarketConfig({
+                ticker: realTickers[i],
+                name: string.concat(realTickers[i], " Robinhood Stock Token (faucet)"),
+                price8: vmDeployer.parseUint(realPrices[i]),
+                tier: "B",
+                token: realTokens[i],
+                lendSeed: vmDeployer.parseUint(realLendSeeds[i]),
+                poolSeed: vmDeployer.parseUint(realPoolSeeds[i])
             });
         }
     }
@@ -145,7 +175,8 @@ abstract contract LocateDeployer {
         internal
     {
         d.tickers[i] = m.ticker;
-        MockStockToken stock = new MockStockToken(m.name, m.ticker, owner);
+        bool isMock = m.token == address(0);
+        MockStockToken stock = isMock ? new MockStockToken(m.name, m.ticker, owner) : MockStockToken(m.token);
         d.tokens[i] = address(stock);
 
         d.feeds[i] = address(new MockFeed(8, string.concat("RH", m.ticker, " / USD"), owner));
@@ -156,26 +187,39 @@ abstract contract LocateDeployer {
             IERC20(address(stock)), string.concat("Locate ", m.ticker), string.concat("l", m.ticker), d.controller, 0.9e18
         );
         d.pools[i] = address(lendingPool);
-        Controller(d.controller).listMarket(address(stock), lendingPool, tierParams(m.tier));
+        Controller.MarketParams memory params = tierParams(m.tier);
+        if (!isMock) params.borrowCapRaw = m.lendSeed * 60 / 100; // faucet balances are small
+        Controller(d.controller).listMarket(address(stock), lendingPool, params);
 
-        // first lender: the owner seeds 1,000 tokens so borrowing works from day one
-        stock.mint(owner, LENDER_SEED_TOKENS);
-        stock.approve(address(lendingPool), LENDER_SEED_TOKENS);
-        lendingPool.deposit(LENDER_SEED_TOKENS, owner);
+        // first lender: the owner seeds the pool so borrowing works from day one
+        if (isMock) stock.mint(owner, m.lendSeed);
+        stock.approve(address(lendingPool), m.lendSeed);
+        lendingPool.deposit(m.lendSeed, owner);
 
-        if (withUniswap) _seedUniswap(d, i, stock, m.price8, owner);
+        if (withUniswap) _seedUniswap(d, i, stock, m, owner, isMock);
     }
 
-    function _seedUniswap(Deployment memory d, uint256 i, MockStockToken stock, uint256 price8, address owner)
-        internal
-    {
-        uint256 tokenAmount = SEED_USDG_PER_MARKET * 1e12 * 1e8 / price8; // tokens worth the USDG seed
-        stock.mint(owner, tokenAmount);
-        MockUSDG(d.usdg).mint(owner, SEED_USDG_PER_MARKET);
+    function _seedUniswap(
+        Deployment memory d,
+        uint256 i,
+        MockStockToken stock,
+        MarketConfig memory m,
+        address owner,
+        bool isMock
+    ) internal {
+        uint256 usdgAmount = SEED_USDG_PER_MARKET;
+        uint256 tokenAmount = usdgAmount * 1e12 * 1e8 / m.price8; // tokens worth the USDG seed
+        if (!isMock) {
+            tokenAmount = m.poolSeed;
+            usdgAmount = tokenAmount * m.price8 / 1e8 / 1e12; // USDG worth the tokens we actually hold
+        } else {
+            stock.mint(owner, tokenAmount);
+        }
+        MockUSDG(d.usdg).mint(owner, usdgAmount);
         stock.approve(d.seeder, tokenAmount);
-        MockUSDG(d.usdg).approve(d.seeder, SEED_USDG_PER_MARKET);
+        MockUSDG(d.usdg).approve(d.seeder, usdgAmount);
         (d.uniswapPools[i],,,) =
-            LiquiditySeeder(d.seeder).seed(address(stock), d.usdg, POOL_FEE, tokenAmount, SEED_USDG_PER_MARKET);
+            LiquiditySeeder(d.seeder).seed(address(stock), d.usdg, POOL_FEE, tokenAmount, usdgAmount);
     }
 
     /// @dev NYSE holidays for the rest of 2026 and 2027. Verify against the exchange calendar each year.

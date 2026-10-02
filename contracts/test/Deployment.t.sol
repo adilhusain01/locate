@@ -31,7 +31,7 @@ contract DeploymentTest is Test, LocateDeployer {
         assertEq(ctl.marketCount(), d.tokens.length);
         for (uint256 i; i < d.tokens.length; ++i) {
             assertTrue(ctl.market(d.tokens[i]).listed);
-            assertEq(LendingPool(d.pools[i]).totalAssets(), LENDER_SEED_TOKENS);
+            assertGt(LendingPool(d.pools[i]).totalAssets(), 0);
             assertTrue(d.uniswapPools[i] != address(0));
             assertGt(ctl.oracle().quote(d.tokens[i]).priceWad, 0);
             assertTrue(ctl.oracle().borrowAllowed(d.tokens[i]));

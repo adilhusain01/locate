@@ -1,17 +1,14 @@
 {
-  "generatedAt": "2026-10-02T14:58:19.076Z",
+  "generatedAt": "2026-10-02T15:43:11.436Z",
   "tickers": [
     "NVDA",
     "SPY",
     "AAPL",
     "MSFT",
-    "TSLA",
-    "AMZN",
     "GOOGL",
     "META",
     "GME",
     "COIN",
-    "PLTR",
     "MSTR"
   ],
   "names": [
@@ -19,13 +16,10 @@
     "SPDR S&P 500 ETF Trust Robinhood Token (Locate testnet mock)",
     "Apple Robinhood Token (Locate testnet mock)",
     "Microsoft Robinhood Token (Locate testnet mock)",
-    "Tesla Robinhood Token (Locate testnet mock)",
-    "Amazon Robinhood Token (Locate testnet mock)",
     "Alphabet Class A Robinhood Token (Locate testnet mock)",
     "Meta Platforms Robinhood Token (Locate testnet mock)",
     "GameStop Robinhood Token (Locate testnet mock)",
     "Coinbase Robinhood Token (Locate testnet mock)",
-    "Palantir Technologies Robinhood Token (Locate testnet mock)",
     "Strategy Inc. Robinhood Token (Locate testnet mock)"
   ],
   "prices8": [
@@ -33,13 +27,10 @@
     "77071210575",
     "33388329774",
     "51739857287",
-    "37279999999",
-    "25167500000",
     "34363467623",
     "73461655013",
     "2394600000",
     "18946000000",
-    "19197500000",
     "16346000000"
   ],
   "tiers": [
@@ -49,11 +40,52 @@
     "A",
     "A",
     "A",
-    "A",
-    "A",
-    "B",
     "B",
     "B",
     "B"
-  ]
+  ],
+  "real": {
+    "tickers": [
+      "AMD",
+      "AMZN",
+      "NFLX",
+      "PLTR",
+      "TSLA"
+    ],
+    "tokens": [
+      "0x71178BAc73cBeb415514eB542a8995b82669778d",
+      "0x5884aD2f920c162CFBbACc88C9C51AA75eC09E02",
+      "0x3b8262A63d25f0477c4DDE23F83cfe22Cb768C93",
+      "0x1FBE1a0e43594b3455993B5dE5Fd0A7A266298d0",
+      "0xC9f9c86933092BbbfFF3CCb4b105A4A94bf3Bd4E"
+    ],
+    "prices8": [
+      "64329500000",
+      "25167500000",
+      "6704500000",
+      "19197500000",
+      "37279999999"
+    ],
+    "lendSeed": [
+      "7000000000000000000",
+      "7000000000000000000",
+      "7000000000000000000",
+      "7000000000000000000",
+      "6000000000000000000"
+    ],
+    "poolSeed": [
+      "7000000000000000000",
+      "7000000000000000000",
+      "7000000000000000000",
+      "7000000000000000000",
+      "6000000000000000000"
+    ],
+    "source": [
+      "chainlink-mainnet",
+      "chainlink-mainnet",
+      "robinhood-rest",
+      "chainlink-mainnet",
+      "chainlink-mainnet"
+    ]
+  }
 }

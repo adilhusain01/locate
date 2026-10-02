@@ -31,3 +31,8 @@ coverage/
 
 # stylus build output
 stylus/target/
+
+# forge broadcast logs (the deployments folder is the record)
+contracts/broadcast/
+# keeper run records
+apps/keepers/runs/

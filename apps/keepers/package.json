@@ -1,0 +1,16 @@
+{
+  "name": "keepers",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "mirror": "node src/price-mirror.ts",
+    "mirror:once": "node src/price-mirror.ts --once"
+  },
+  "dependencies": {
+    "viem": "^2.37.0"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "typescript": "^5.9.0"
+  }
+}
