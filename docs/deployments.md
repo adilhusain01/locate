@@ -15,6 +15,8 @@ Mainnet references used by the mirror and fork tests: USDG `0x5fc5360D0400a0Fd4f
 
 ## Robinhood Chain testnet (46630), deployed 2026-10-02
 
+The Controller was pointed at the Stylus risk engine and oracle router on 2026-10-02 after `scripts/diff-check.ts` found the Stylus and Solidity contracts identical on 40 random health evaluations, nine rate points, six auction points and all 14 live quotes. `scripts/configure-stylus.ts` holds the configuration (holidays, feeds, TWAP pools with a 30 minute window, sequencer and USDG feeds, keeper rights). The Solidity router and RiskMathRef stay deployed as the reference.
+
 Deployer and owner: `0x610FdB41DA83138615C317c89fd9EB09271a46fe` (Adil's burner). Keeper: `0x319a9B7EA619Dd52c799209c111A5c348c9a3957`.
 The official RPC `https://rpc.testnet.chain.robinhood.com` serves full state for forge scripts; `https://robinhood-sepolia-rpc.publicnode.com` and `https://robinhood-testnet.drpc.org` allow Stylus activation checks and deploys.
 
@@ -31,6 +33,9 @@ The official RPC `https://rpc.testnet.chain.robinhood.com` serves full state for
 | Uniswap v3 SwapRouter | `0xB72704f3759077Df559725057c1212f47af27e4D` |
 | LiquiditySeeder | `0x27487997EB47991c1b9C7DA4A9591C0cAdBAee41` |
 | Sequencer feed (mock) | `0x42964c0BAf292b723598e1499B5E7f739B719515` |
+| Stylus risk engine (live in the Controller) | `0x4b7c8bd51abda2ccf421312094e368895c8953f0` |
+| Stylus market calendar | `0x0735725103ac33a4ed1c4919539c01139703c6ad` |
+| Stylus oracle router (live in the Controller) | `0x2fc6e9895772017d769b3e6f7680f90ff7a154e7` |
 | USDG/USD feed (mock, mirrored) | `0xb1a37B21ed242009A947cCD603BB8F5551e8F4E2` |
 
 Markets. The first nine are Locate mocks priced from the mainnet feeds; AMD, AMZN, NFLX, PLTR and TSLA are the real faucet Stock Tokens (beacon proxies over `0x1df3ca0fd30ed5eeb09eb01938f4e9c5196e6ca5`), seeded from the deployer's faucet balance. Real testnet USDG from the faucet is `0x7E955252E15c84f5768B83c41a71F9eba181802F`; the protocol uses its own MockUSDG with a faucet because only 85 real units were available.
