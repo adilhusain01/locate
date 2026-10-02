@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { TxButton } from "@/components/tx-button";
 import { d, markets, REAL_TICKERS, useMyAccount } from "@/lib/locate";
 import { fmtUsdg } from "@/lib/format";
+import { GasDrip } from "@/components/gas-drip";
 
 export default function FaucetPage() {
   const { address } = useAccount();
@@ -17,6 +18,10 @@ export default function FaucetPage() {
         <p className="mt-1 text-sm text-muted-foreground">Testnet only. Mock USDG and the mock stock tokens mint once a day per address. The faucet tokens come from Robinhood&apos;s own faucet.</p>
       </div>
       <div className="grid gap-4 md:grid-cols-3">
+        <Card className="md:col-span-3">
+          <CardHeader><CardTitle className="text-base">Start here: gas</CardTitle><CardDescription>A fresh wallet has no testnet ETH, so its first transaction cannot be paid for. Take a drip here, or use Robinhood&apos;s faucet for more.</CardDescription></CardHeader>
+          <CardContent><GasDrip /></CardContent>
+        </Card>
         <Card>
           <CardHeader><CardTitle className="text-base">USDG (mock)</CardTitle><CardDescription>1,000 USDG per claim. You hold {fmtUsdg(me.usdgBalance)}.</CardDescription></CardHeader>
           <CardContent><TxButton label="Claim 1,000 USDG" disabled={!address} write={() => ({ address: d.usdg, abi: mockUsdgAbi, functionName: "faucet" })} onDone={() => me.refetch()} /></CardContent>

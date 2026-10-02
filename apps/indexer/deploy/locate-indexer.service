@@ -1,0 +1,19 @@
+[Unit]
+Description=Locate indexer (Ponder, Robinhood Chain testnet)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/Projects/locate/apps/indexer
+EnvironmentFile=/root/Projects/locate/.env
+Environment=PONDER_RPC_URL_46630=https://rpc.testnet.chain.robinhood.com
+Environment=PORT=42069
+ExecStart=/usr/local/bin/pnpm ponder start --port 42069 --hostname 127.0.0.1
+Restart=always
+RestartSec=10
+StandardOutput=append:/var/log/locate-indexer.log
+StandardError=append:/var/log/locate-indexer.log
+
+[Install]
+WantedBy=multi-user.target
