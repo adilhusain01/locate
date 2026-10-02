@@ -5,7 +5,7 @@ Addresses are written by `contracts/script/DeployTestnet.s.sol` to `contracts/de
 | Network | Chain id | Status |
 |---|---|---|
 | Robinhood Chain testnet | 46630 | deployed 2026-10-02 (209 transactions, about 0.004 ETH); addresses below |
-| Arbitrum Sepolia | 421614 | not deployed yet |
+| Arbitrum Sepolia | 421614 | deployed 2026-10-02 (154 transactions, about 0.006 ETH), nine mock markets, Solidity router and engine; addresses below |
 | Robinhood Chain mainnet | 4663 | read-only (fork tests and the price mirror) |
 
 Deployer address (throwaway key, kept in the VPS `.env` only): `0x500FD8eD217C8dF1E458630489D8D80B443784F1`
@@ -56,3 +56,34 @@ Markets. The first nine are Locate mocks priced from the mainnet feeds; AMD, AMZ
 | NFLX | `0x3b8262A63d25f0477c4DDE23F83cfe22Cb768C93` | `0x8A4C517645E0A3CE3fF4EBA24DbEACB9f560a315` | `0x8D8d6de4Ab504393570438Fd60AaE802E114Bd3B` | `0x6951c4206FAAD6e497F2Ab8BF08F8A6830C48d6E` |
 | PLTR | `0x1FBE1a0e43594b3455993B5dE5Fd0A7A266298d0` | `0x69a4BcE115b3587B71B5461B3c7209FA8718eD21` | `0xFDd5ef15Df438F0BC185a315A7390d290d85AEfE` | `0xaf76839d832f7E95423dd004352BBa3431125537` |
 | TSLA | `0xC9f9c86933092BbbfFF3CCb4b105A4A94bf3Bd4E` | `0xCE02fB10cE315f19f2E6ED417C2C383A51776e92` | `0x04a296C95c97d45B6176Fb8e0a0d665042f262aC` | `0x24501b388307bD8503d02E8E434fA3BaB83EA18E` |
+
+## Arbitrum Sepolia (421614), deployed 2026-10-02
+
+Mirror of the Robinhood testnet stack with the nine mock markets (the faucet Stock Tokens only exist on Robinhood Chain). The Controller runs on the Solidity oracle router and RiskMathRef here: the public Arbitrum Sepolia RPCs (official, publicnode, dRPC) reject the simulated activation call `cargo stylus` needs, so the Stylus contracts wait for an RPC with state override support (an Alchemy or Infura key). Deployer and owner `0x610FdB41DA83138615C317c89fd9EB09271a46fe`, keeper `0x319a9B7EA619Dd52c799209c111A5c348c9a3957`, deployment block 315039952.
+
+| Contract | Address |
+|---|---|
+| MockUSDG (collateral, faucet) | `0x7b6F310e56a6D52DD1C5ffF857bBC9C3dE7F80CE` |
+| Controller | `0x6c79924FC12d4645EFCB337Ab07D76783F7555c2` |
+| OracleRouter (Solidity, live) | `0x69A5adcfBCe0D9a5509ca9320E91EA33a897d056` |
+| RiskMathRef (live) | `0xcc5eb30C661C64B25F0F157f57B8fA44450D49Ba` |
+| MarketCalendar (Solidity) | `0xd60Ca0db668a36962EC30e71d13A597683AEa19B` |
+| ShortRouter | `0x6081650D5e5791f3747bf934F287b83d694224b0` |
+| Liquidator | `0x328dDA4319d78e3d7E52B9cab20D474eE3D74c75` |
+| Uniswap v3 factory | `0x2f2208b7Ce0E6d51971dE45f0A70689B106bF574` |
+| Uniswap v3 SwapRouter | `0x8Beae8eDD52C508D832d349a50E86B7790Fcefc9` |
+| LiquiditySeeder | `0xFBe11448b467e397c57B229E7Ada487A3859042e` |
+| Sequencer feed (mock) | `0xc38af15c3555AD2dDDA3De50b6A797efaae5146d` |
+| USDG/USD feed (mock, mirrored) | `0xDcaa9BcbE1cd402074Ff80642f3aDF23aF2d7f9e` |
+
+| Ticker | Token | Lending pool | Feed (mock, mirrored) | Uniswap v3 pool |
+|---|---|---|---|---|
+| NVDA | `0xe0ECD5513baeaff8444c9690C6d845f73EE8370d` | `0x965745066f15A0aeaFC42b291433B6362c9c0B97` | `0xC0f68863bDF21A87fEE287fa082a0Bf269e84E4A` | `0x57637294A8E6E4f2E231ba3F3B05997097bA059a` |
+| SPY | `0x4AC34ADB84aaE91D9dEBFB2cD60F7B959F3dFf01` | `0xad7baF95878D335323A9E666F44bDa48F1D0846C` | `0xb3dc16F6F61a0cbB14EB9a8e5dd19FC74cC3f338` | `0x24fC6Ca9F20e7681eE2dDcB248bE7359a0dD2e41` |
+| AAPL | `0xbf4D2f3731258ba4EFC72Ad1e5081A8c574b7439` | `0x793F4046C51F18f1978BD509E794e30825D31334` | `0xeC602a39dc73F490034dF850dbB2510772425fFD` | `0xEAAfF1fd39B5daB5EeD234cCb2A70A5095984C56` |
+| MSFT | `0xec1ABb1fda29b23b78696074025446aC5F20D2FF` | `0x674417cf60251EFCbFDB09A790127d2F6543C284` | `0x21479E0BF906BEdde693a67dbDCF772C8d5b7A36` | `0x9e6227A53e3A9F44F627fC9359F0Cc2201B91561` |
+| GOOGL | `0x85f140298f5d5F62A889a6A69d609e98ACB96060` | `0xf6F49b3D7940af9C2a757FeF789C84b756488f7C` | `0xfCDa641c06Db58770DB0CBfd186A4ab9D71Cd387` | `0xb959d8a51b137126418F2BBEE5c7658c00ce73d8` |
+| META | `0x22305F509a86826D1D6183A25Be9b618f6F33611` | `0x1CCbbc30aD26D481816BEfF4d194d134Cd353a2B` | `0xd4F340526B95dE9F12d48E5165C9C3fa8a53eF7d` | `0xAd4064040CB62426C099C94d004706C6Fbb0b541` |
+| GME | `0x517D941354B2773852ba4aEb3b6d3bAF600EC415` | `0x45df8Dc662f077B5FC0bb79869a90e22931c99a0` | `0xC1EF6A0B2cd377CcC297137c7c7c866dfdcb182D` | `0x91619735469340561b2dAff5fa4586AF2EAD5161` |
+| COIN | `0xC474ee853c670ceed78F782D0BB8AedabF464f4a` | `0x8B13487833c166d2bb318cec8a0771E882f67616` | `0xEDC25367AF422414cD79CF1f4AF79c3B3b373640` | `0xd0d5Bf1154680905c0B739Fdb050752cabDED824` |
+| MSTR | `0x4A529e4cE2624c722ACAB1d7d1106397C3daccc6` | `0xD17B058649f3aa92b3ea91280C2BCAEA40b63cD7` | `0x8AFb6342DCc92568CeCAf4F2E38D20a7E87b0e4B` | `0x88F054cB9F2de5bc3bc096330A75Ac9FDFc9F837` |

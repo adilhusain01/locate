@@ -1,5 +1,6 @@
 import type { Address } from "viem";
 import testnet from "../../../contracts/deployments/46630.json" with { type: "json" };
+import sepolia from "../../../contracts/deployments/421614.json" with { type: "json" };
 
 export type Deployment = {
   chainId: number;
@@ -30,6 +31,7 @@ export type Deployment = {
 
 export const deployments: Record<number, Deployment> = {
   46630: testnet as unknown as Deployment,
+  421614: sepolia as unknown as Deployment,
 };
 
 export function deployment(chainId: number): Deployment {
