@@ -3,12 +3,10 @@
 // without a mainnet feed (NFLX) take Robinhood's REST mid with the current time as updatedAt. Also mirrors the
 // USDG/USD feed. Runs every MIRROR_INTERVAL_SECONDS (default 300) unless started with --once.
 import { readFileSync } from "node:fs";
-import { createPublicClient, createWalletClient, http, parseAbi, type Address, type Hex } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
-import { robinhoodMainnet, robinhoodTestnet } from "./chains.ts";
+import { parseAbi, type Address } from "viem";
 import { run } from "./runlog.ts";
+import { account, chain, d as deployed, mainnet, pub as testnet, wallet } from "./clients.ts";
 
-const DEPLOYMENTS = process.env.DEPLOYMENTS_FILE ?? new URL("../../../contracts/deployments/46630.json", import.meta.url).pathname;
 const REGISTRY = process.env.REGISTRY_FILE ?? new URL("../../../packages/sdk/registry/robinhood-mainnet.json", import.meta.url).pathname;
 const USDG_USD_FEED: Address = "0x61B7e5650328764B076A108EFF5fa7282a1B9aD2";
 const INTERVAL = Number(process.env.MIRROR_INTERVAL_SECONDS ?? 300);
@@ -21,12 +19,6 @@ const feedAbi = parseAbi([
 type Deployment = { tickers: string[]; feeds: Address[]; usdgFeed: Address };
 type Registry = { tokens: { ticker: string; feed: null | { address: Address } }[] };
 
-const key = process.env.KEEPER_PRIVATE_KEY ?? process.env.DEPLOYER_PRIVATE_KEY;
-if (!key) throw new Error("KEEPER_PRIVATE_KEY (or DEPLOYER_PRIVATE_KEY) is not set");
-const account = privateKeyToAccount(key as Hex);
-const mainnet = createPublicClient({ chain: robinhoodMainnet, transport: http() });
-const testnet = createPublicClient({ chain: robinhoodTestnet, transport: http() });
-const wallet = createWalletClient({ account, chain: robinhoodTestnet, transport: http() });
 
 async function restMid(ticker: string): Promise<bigint> {
   const res = await fetch(`https://api.robinhood.com/rhj/prices/${ticker}`, {
@@ -39,7 +31,7 @@ async function restMid(ticker: string): Promise<bigint> {
 
 async function mirrorOnce() {
   await run("price-mirror", async (fail) => {
-    const deployment = JSON.parse(readFileSync(DEPLOYMENTS, "utf8")) as Deployment;
+    const deployment = deployed as unknown as Deployment;
     const registry = JSON.parse(readFileSync(REGISTRY, "utf8")) as Registry;
     const mainnetFeed = new Map(registry.tokens.filter((t) => t.feed).map((t) => [t.ticker, t.feed!.address]));
 
@@ -89,7 +81,7 @@ async function mirrorOnce() {
         fail(t, error);
       }
     }
-    return { markets: targets.length, written, unchanged, keeper: account.address };
+    return { chain: chain.id, markets: targets.length, written, unchanged, keeper: account.address };
   });
 }
 

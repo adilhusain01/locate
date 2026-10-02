@@ -1,0 +1,19 @@
+[Unit]
+Description=Locate keeper: liquidator (Robinhood Chain testnet)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/root/Projects/locate/apps/keepers
+EnvironmentFile=/root/Projects/locate/.env
+Environment=CHAIN_ID=46630
+Environment=RUNLOG_DIR=/root/Projects/locate/apps/keepers/runs
+ExecStart=/usr/local/bin/node src/liquidator.ts
+Restart=always
+RestartSec=15
+StandardOutput=append:/var/log/locate-liquidator.log
+StandardError=append:/var/log/locate-liquidator.log
+
+[Install]
+WantedBy=multi-user.target
