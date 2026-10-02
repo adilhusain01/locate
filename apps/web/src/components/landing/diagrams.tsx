@@ -1,4 +1,4 @@
-import { T, hv, vh, hvh } from "./tokens";
+import { T, hv, vh, hvh, vhv } from "./tokens";
 import { Defs, Figure, Label, Legend, Node } from "./svg-bits";
 
 /// Roles: who gives what to whom. Focal element: the lending pool.
@@ -19,22 +19,19 @@ export function RolesDiagram() {
         <Label x={428} y={70} text="BORROW RAW" tone={T.short} />
         <path d={hv(464, 112, 392, 112)} stroke={T.short} strokeWidth={1.2} fill="none" strokeDasharray="5,4" markerEnd={`url(#${id}-arrow-short)`} />
         <Label x={428} y={132} text="REPAY RAW" tone={T.short} />
-        <path d={vh(544, 128, 544, 196)} stroke={T.muted} strokeWidth={1.2} fill="none" markerEnd={`url(#${id}-arrow)`} />
+        <path d={vh(544, 132, 544, 196)} stroke={T.muted} strokeWidth={1.2} fill="none" markerEnd={`url(#${id}-arrow)`} />
         <Label x={562} y={166} text="SELL, BUY BACK" anchor="start" />
-        <path d={hvh(464, 100, 312, 128, 400)} stroke={T.muted} strokeWidth={1.2} fill="none" />
-        <path d={vh(312, 128, 312, 128)} stroke="none" fill="none" />
-        <path d={hvh(480, 104, 312, 128, 408)} stroke="none" fill="none" />
-        <path d={hvh(496, 128, 332, 196, 420)} stroke={T.accent} strokeWidth={1.2} fill="none" markerEnd={`url(#${id}-arrow-accent)`} />
-        <Label x={420} y={176} text="USDG FEE, 90%" tone={T.accent} anchor="middle" />
-        <path d={hvh(512, 128, 140, 232, 440)} stroke={T.muted} strokeWidth={1.2} fill="none" strokeDasharray="4,3" markerEnd={`url(#${id}-arrow)`} />
-        <Label x={300} y={222} text="USDG FEE, 10%" />
+        <path d={vhv(496, 132, 312, 196, 168)} stroke={T.accent} strokeWidth={1.2} fill="none" markerEnd={`url(#${id}-arrow-accent)`} />
+        <Label x={404} y={158} text="USDG FEES" tone={T.accent} />
+        <path d={hv(232, 232, 160, 232)} stroke={T.muted} strokeWidth={1.2} fill="none" strokeDasharray="4,3" markerEnd={`url(#${id}-arrow)`} />
+        <Label x={196} y={218} text="10% SHARE" />
         {/* nodes */}
         <Node x={40} y={60} w={120} h={72} kind="user" name="Lenders" sub="hold stock tokens" />
         <Node x={232} y={56} w={160} h={80} kind="focal" name="Lending pool" sub="ERC-4626, raw units" tag="ONE PER TICKER" />
         <Node x={464} y={60} w={160} h={72} kind="short" name="Borrowers" sub="USDG collateral" />
         <Node x={464} y={196} w={160} h={56} kind="external" name="Uniswap v3" sub="NVDA / USDG pool" />
-        <Node x={232} y={196} w={160} h={56} kind="store" name="Lender rewards" sub="USDG, claim any time" />
-        <Node x={40} y={208} w={120} h={48} kind="store" name="Insurance fund" sub="bad debt first" />
+        <Node x={232} y={196} w={160} h={56} kind="store" name="Lender rewards" sub="90% of fees, claim any time" />
+        <Node x={40} y={208} w={120} h={48} kind="store" name="Insurance fund" sub="pays bad debt first" />
       </svg>
       <Legend items={[{ swatch: T.accentTint, label: "The pool, where every market lives" }, { swatch: T.lendTint, label: "Lender side" }, { swatch: T.shortTint, label: "Borrower side" }, { swatch: "rgba(20,26,31,0.05)", label: "USDG held by the Controller" }, { swatch: T.paper, label: "Dashed: returns and small flows", dashed: true }]} />
     </Figure>
@@ -212,14 +209,14 @@ export function StylusArchitecture() {
         <Label x={340} y={78} text="EVALUATE, RATES" tone={T.accent} />
         <path d={hv(260, 124, 420, 124)} stroke={T.accent} strokeWidth={1.2} fill="none" markerEnd={`url(#${id}-arrow-accent)`} />
         <Label x={340} y={144} text="QUOTE, REGIME" tone={T.accent} />
-        <path d={hvh(580, 140, 580, 200, 580)} stroke={T.muted} strokeWidth={1.2} fill="none" markerEnd={`url(#${id}-arrow)`} />
-        <Label x={592} y={172} text="SESSION" anchor="start" />
-        <path d={hvh(500, 140, 500, 200, 500)} stroke={T.muted} strokeWidth={1.2} fill="none" markerEnd={`url(#${id}-arrow)`} />
-        <Label x={488} y={172} text="LATEST PRINT" anchor="end" />
-        <path d={hvh(440, 140, 440, 264, 440)} stroke={T.muted} strokeWidth={1.2} fill="none" strokeDasharray="4,3" markerEnd={`url(#${id}-arrow)`} />
+        <path d={vh(618, 156, 618, 200)} stroke={T.muted} strokeWidth={1.2} fill="none" markerEnd={`url(#${id}-arrow)`} />
+        <Label x={630} y={190} text="SESSION" anchor="start" />
+        <path d={vh(508, 156, 508, 200)} stroke={T.muted} strokeWidth={1.2} fill="none" markerEnd={`url(#${id}-arrow)`} />
+        <Label x={520} y={174} text="LATEST PRINT" anchor="start" />
+        <path d={vh(440, 156, 440, 264)} stroke={T.muted} strokeWidth={1.2} fill="none" strokeDasharray="4,3" markerEnd={`url(#${id}-arrow)`} />
         <Label x={428} y={236} text="OBSERVE TWAP" anchor="end" />
         <path d={vh(140, 140, 140, 200)} stroke={T.ink} strokeWidth={1.2} fill="none" markerEnd={`url(#${id}-arrow)`} />
-        <Label x={152} y={172} text="BORROW, REPAY, FEES" anchor="start" />
+        <Label x={128} y={172} text="BORROW, REPAY" anchor="end" />
         <path d={vh(220, 140, 220, 264)} stroke={T.ink} strokeWidth={1.2} fill="none" markerEnd={`url(#${id}-arrow)`} />
         <Label x={232} y={236} text="CALLBACKS" anchor="start" />
         {/* nodes */}
@@ -228,11 +225,11 @@ export function StylusArchitecture() {
         <Node x={420} y={112} w={240} h={44} kind="focal" name="Oracle router" sub="Rust on Stylus, 29.6 KB" tag="RUST" />
         <Node x={60} y={200} w={160} h={48} kind="step" name="Lending pools" sub="14 ERC-4626 vaults" />
         <Node x={60} y={264} w={320} h={44} kind="step" name="ShortRouter, Liquidator" sub="Solidity periphery, Uniswap routes" />
-        <Node x={420} y={200} w={120} h={48} kind="external" name="Chainlink" sub="per token, 24/5" />
-        <Node x={548} y={200} w={112} h={48} kind="step" name="Calendar" sub="Rust on Stylus" tag="RUST" />
+        <Node x={448} y={200} w={120} h={48} kind="external" name="Chainlink" sub="per token, 24/5" />
+        <Node x={576} y={200} w={84} h={48} kind="store" name="Calendar" sub="Rust on Stylus" />
         <Node x={420} y={264} w={240} h={44} kind="external" name="Uniswap v3 pools" sub="token / USDG" />
       </svg>
-      <Legend items={[{ swatch: T.accentTint, label: "Rust on Stylus, the two contracts the Controller calls" }, { swatch: T.paper2, label: "Solidity" }, { swatch: "rgba(20,26,31,0.03)", label: "External" }]} />
+      <Legend items={[{ swatch: T.accentTint, label: "Rust on Stylus, the two contracts the Controller calls" }, { swatch: "rgba(20,26,31,0.05)", label: "Rust on Stylus, read by the router" }, { swatch: T.paper2, label: "Solidity" }, { swatch: "rgba(20,26,31,0.03)", label: "External" }]} />
     </Figure>
   );
 }

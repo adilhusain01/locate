@@ -3,7 +3,7 @@ import Link from "next/link";
 export function Section({ id, title, lead, children }: { id: string; title: string; lead?: string; children: React.ReactNode }) {
   return (
     <section id={id} className="scroll-mt-20 border-t py-14 sm:py-20">
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)] lg:gap-14">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.4fr)] lg:gap-12">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h2>
           {lead && <p className="mt-4 max-w-prose text-base leading-relaxed text-muted-foreground">{lead}</p>}

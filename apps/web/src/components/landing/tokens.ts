@@ -38,3 +38,12 @@ export function hvh(x1: number, y1: number, x2: number, y2: number, xm: number, 
   const d2 = Math.sign(x2 - xm);
   return `M${x1} ${y1} L${xm - d1 * r} ${y1} Q${xm} ${y1} ${xm} ${y1 + dy * r} L${xm} ${y2 - dy * r} Q${xm} ${y2} ${xm + d2 * r} ${y2} L${x2} ${y2}`;
 }
+
+/// Vertical, then horizontal, then vertical: leaves a bottom edge, runs along y = ym, enters a top edge.
+export function vhv(x1: number, y1: number, x2: number, y2: number, ym: number, r = 8) {
+  if (x1 === x2) return `M${x1} ${y1} L${x2} ${y2}`;
+  const dx = Math.sign(x2 - x1);
+  const d1 = Math.sign(ym - y1);
+  const d2 = Math.sign(y2 - ym);
+  return `M${x1} ${y1} L${x1} ${ym - d1 * r} Q${x1} ${ym} ${x1 + dx * r} ${ym} L${x2 - dx * r} ${ym} Q${x2} ${ym} ${x2} ${ym + d2 * r} L${x2} ${y2}`;
+}
