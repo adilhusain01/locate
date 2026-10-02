@@ -48,3 +48,23 @@ Locate is the first on-chain stock lending and borrowing market for Robinhood Ch
 6. Stylus: what runs where and why.
 7. What is live and the numbers from testnet.
 8. Roadmap and the ask.
+
+## Shot list for recording (desktop browser, about four minutes)
+
+Record at 1440 wide or wider, cursor visible, no narration needed if you add captions later. Use the Privy email login with a fresh address so the gas step shows.
+
+| # | Where | Do | Say or caption |
+|---|---|---|---|
+| 1 | https://locate-pi.vercel.app | Scroll the hero and the live ticket slowly; pause on the live markets table | "Fourteen stock token markets on Robinhood Chain testnet, five of them the real faucet tokens. Every ticker already has a borrow rate." |
+| 2 | Landing, How a market works | Scroll past the roles diagram and the sequence diagram | "Lenders hold shares over raw units. A short borrows, sells and books the proceeds as margin before the ratio check." |
+| 3 | Open app, Sign in | Email login, code, wallet created | "Judges get a wallet from an email." |
+| 4 | /app/faucet | Get 0.002 testnet ETH for gas, then Claim 1,000 USDG, then Claim 1,000 NVDA | "Testnet gas and mock assets; prices are the mainnet Chainlink prints, mirrored." |
+| 5 | /app/lend?ticker=NVDA | Approve, deposit 100 NVDA; point at effective shares and the multiplier | "You keep the stock, the splits and the dividends; the fee is paid in USDG." |
+| 6 | /app/short?ticker=NVDA | Approve USDG, deposit 1,000 USDG, Approve Locate router, short 2 NVDA; point at collateral rising by the proceeds and the health factor | "One transaction. The sale proceeds count as margin, like a brokerage." |
+| 7 | /app/portfolio | Show the short row with its liquidation price and the lending row with claimable USDG | "Liquidation price is where health reaches one." |
+| 8 | Landing, Prices and Liquidations | Scroll the week strip, the regime machine and the auction curve | "Chainlink runs 24/5, the tokens trade 24/7. Outside the session the pool price moves the last print inside a band. Below health one, a Dutch auction; the flash path needs no capital." |
+| 9 | Landing, Stylus | Scroll the architecture diagram and the numbers | "Risk engine and oracle router are Rust on Stylus, checked against the Solidity reference on the live chain to the wei before the switch." |
+| 10 | /app/short | Cover the 2 NVDA; point at collateral after | "Cover buys back, repays and returns the change." |
+| 11 | GitHub repo, docs/deployments.md | Show the addresses and the test counts | "100 Foundry tests, six invariants, 17 Rust tests, everything deployed and verified." |
+
+Keep each shot under 25 seconds. If a transaction waits on the chain, cut the wait.
