@@ -9,6 +9,7 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 import {EnumerableSet} from "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {IController} from "./interfaces/IController.sol";
+import {IControllerCallback} from "./interfaces/IControllerCallback.sol";
 import {ILendingPool} from "./interfaces/ILendingPool.sol";
 import {IOracleRouter} from "./interfaces/IOracleRouter.sol";
 import {IRiskEngine} from "./interfaces/IRiskEngine.sol";
@@ -75,6 +76,7 @@ contract Controller is IController, Ownable2Step, ReentrancyGuard {
     mapping(address pool => address token) public poolToken;
     address[] public marketList;
     mapping(address account => Account) internal _accounts;
+    mapping(address account => mapping(address operator => bool)) public isOperator;
 
     event MarketListed(address indexed token, address indexed pool);
     event MarketParamsUpdated(address indexed token);
@@ -102,6 +104,7 @@ contract Controller is IController, Ownable2Step, ReentrancyGuard {
     );
     event BadDebtAbsorbed(address indexed account, address indexed token, uint256 debtRaw, uint256 compensationUsdg);
     event InsuranceWithdrawn(address indexed to, uint256 amount);
+    event OperatorSet(address indexed account, address indexed operator, bool approved);
 
     error NotGuardian();
     error NotPool();
@@ -121,6 +124,7 @@ contract Controller is IController, Ownable2Step, ReentrancyGuard {
     error BelowMinOut(uint256 usdgOut, uint256 minUsdgOut);
     error CollateralRemains();
     error NoDebt();
+    error NotOperator();
 
     modifier onlyGuardianOrOwner() {
         if (msg.sender != guardian && msg.sender != owner()) revert NotGuardian();
@@ -209,7 +213,9 @@ contract Controller is IController, Ownable2Step, ReentrancyGuard {
 
     // ------------------------------------------------------------------ collateral
 
-    function depositCollateral(uint256 amount, address onBehalfOf) external nonReentrant {
+    /// @dev Not reentrancy-guarded on purpose: deferred-check callbacks deposit proceeds through here, and the
+    ///      function only ever improves an account (USDG is a plain ERC-20 with no hooks).
+    function depositCollateral(uint256 amount, address onBehalfOf) external {
         if (amount == 0) revert ZeroAmount();
         Account storage a = _accounts[onBehalfOf];
         usdg.safeTransferFrom(msg.sender, address(this), amount);
@@ -234,31 +240,51 @@ contract Controller is IController, Ownable2Step, ReentrancyGuard {
     // ------------------------------------------------------------------ borrowing
 
     function borrow(address token, uint256 rawAmount, address to) external nonReentrant {
-        if (rawAmount == 0) revert ZeroAmount();
-        Market storage m = _market(token);
-        if (borrowsPaused || m.borrowPaused) revert BorrowsPaused();
-        if (!oracle.borrowAllowed(token)) revert BorrowNotAllowedByOracle();
-        Account storage a = _accounts[msg.sender];
-        _accrueAll(a);
-        _accrue(token, m);
-        _settle(msg.sender, a);
-
-        if (m.totalDebtRaw + rawAmount > m.params.borrowCapRaw) revert BorrowCapExceeded(m.params.borrowCapRaw);
-        Position storage p = a.positions[token];
-        if (p.debtRaw == 0) {
-            a.borrowed.add(token);
-            p.feeIndexSnapshot = m.feeIndex;
-        }
-        p.debtRaw += rawAmount;
-        m.totalDebtRaw += rawAmount;
+        Account storage a = _borrow(msg.sender, token, rawAmount, to);
         _requireInitialRatio(msg.sender, a);
+    }
 
-        m.pool.borrow(rawAmount, to);
-        emit Borrowed(msg.sender, token, to, rawAmount);
+    /// @notice Let `operator` borrow and withdraw on your behalf through the deferred-check functions.
+    function setOperator(address operator, bool approved) external {
+        isOperator[msg.sender][operator] = approved;
+        emit OperatorSet(msg.sender, operator, approved);
+    }
+
+    /// @notice Borrow for `account`, hand the tokens to `receiver`, let it act, then check the initial ratio.
+    ///         This is how a short works: the receiver sells the tokens and deposits the USDG before the check.
+    function borrowWithCallback(address account, address token, uint256 rawAmount, address receiver, bytes calldata data)
+        external
+        nonReentrant
+    {
+        _requireOperator(account);
+        Account storage a = _borrow(account, token, rawAmount, receiver);
+        IControllerCallback(receiver).onLocateBorrow(account, token, rawAmount, data);
+        _requireInitialRatio(account, a);
+    }
+
+    /// @notice Withdraw USDG for `account` to `receiver`, let it act, then check the initial ratio.
+    ///         This is how a cover works: the receiver buys the tokens back and repays before the check.
+    function withdrawWithCallback(address account, uint256 amount, address receiver, bytes calldata data)
+        external
+        nonReentrant
+    {
+        if (amount == 0) revert ZeroAmount();
+        _requireOperator(account);
+        Account storage a = _accounts[account];
+        _accrueAll(a);
+        _settle(account, a);
+        if (amount > a.collateral) revert InsufficientCollateral(a.collateral);
+        a.collateral -= amount;
+        usdg.safeTransfer(receiver, amount);
+        IControllerCallback(receiver).onLocateWithdraw(account, amount, data);
+        _requireInitialRatio(account, a);
+        emit CollateralWithdrawn(account, receiver, amount);
     }
 
     /// @notice Repay up to `rawAmount` of `onBehalfOf`'s debt in `token`. Pass type(uint256).max for all of it.
-    function repay(address token, uint256 rawAmount, address onBehalfOf) external nonReentrant returns (uint256 repaid) {
+    /// @dev Not reentrancy-guarded on purpose: deferred-check callbacks repay through here, and repaying only
+    ///      ever improves an account. Tokens are owner-listed ERC-20s without hooks.
+    function repay(address token, uint256 rawAmount, address onBehalfOf) external returns (uint256 repaid) {
         Market storage m = _market(token);
         Account storage a = _accounts[onBehalfOf];
         _accrue(token, m);
@@ -275,10 +301,12 @@ contract Controller is IController, Ownable2Step, ReentrancyGuard {
     // ------------------------------------------------------------------ liquidation
 
     /// @notice Repay part of an unhealthy account's `token` debt and receive its USDG at the auction discount.
+    /// @return repaidRaw the raw units actually taken, after the close factor
+    /// @return usdgOut the USDG paid to the liquidator
     function liquidate(address account, address token, uint256 repayRaw, uint256 minUsdgOut)
         external
         nonReentrant
-        returns (uint256 usdgOut)
+        returns (uint256 repaidRaw, uint256 usdgOut)
     {
         Market storage m = _market(token);
         Account storage a = _accounts[account];
@@ -311,6 +339,7 @@ contract Controller is IController, Ownable2Step, ReentrancyGuard {
         usdg.safeTransfer(msg.sender, usdgOut);
         _maybeClearAuction(account, a);
         emit Liquidated(account, token, msg.sender, repayRaw, usdgOut, discount);
+        repaidRaw = repayRaw;
     }
 
     /// @notice Once an account has no collateral left, write its remaining debt off against the insurance fund.
@@ -502,6 +531,38 @@ contract Controller is IController, Ownable2Step, ReentrancyGuard {
             a.auctionStart = 0;
             emit AuctionCleared(account);
         }
+    }
+
+    // ------------------------------------------------------------------ internals: borrowing
+
+    function _borrow(address account, address token, uint256 rawAmount, address to)
+        internal
+        returns (Account storage a)
+    {
+        if (rawAmount == 0) revert ZeroAmount();
+        Market storage m = _market(token);
+        if (borrowsPaused || m.borrowPaused) revert BorrowsPaused();
+        if (!oracle.borrowAllowed(token)) revert BorrowNotAllowedByOracle();
+        a = _accounts[account];
+        _accrueAll(a);
+        _accrue(token, m);
+        _settle(account, a);
+
+        if (m.totalDebtRaw + rawAmount > m.params.borrowCapRaw) revert BorrowCapExceeded(m.params.borrowCapRaw);
+        Position storage p = a.positions[token];
+        if (p.debtRaw == 0) {
+            a.borrowed.add(token);
+            p.feeIndexSnapshot = m.feeIndex;
+        }
+        p.debtRaw += rawAmount;
+        m.totalDebtRaw += rawAmount;
+
+        m.pool.borrow(rawAmount, to);
+        emit Borrowed(account, token, to, rawAmount);
+    }
+
+    function _requireOperator(address account) internal view {
+        if (msg.sender != account && !isOperator[account][msg.sender]) revert NotOperator();
     }
 
     // ------------------------------------------------------------------ internals: token movement

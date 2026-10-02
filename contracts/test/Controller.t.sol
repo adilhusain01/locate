@@ -108,7 +108,7 @@ contract ControllerTest is Test {
         token.mint(liquidator, repayRaw);
         vm.startPrank(liquidator);
         token.approve(address(ctl), repayRaw);
-        uint256 out = ctl.liquidate(borrower, address(token), repayRaw, minOut);
+        (, uint256 out) = ctl.liquidate(borrower, address(token), repayRaw, minOut);
         vm.stopPrank();
         return out;
     }
@@ -249,8 +249,9 @@ contract ControllerTest is Test {
         nvda.approve(address(ctl), 10e18);
         vm.expectEmit(address(ctl));
         emit Controller.AuctionStarted(borrower, 0.96e18);
-        uint256 out = ctl.liquidate(borrower, address(nvda), 10e18, 0);
+        (uint256 repaidRaw, uint256 out) = ctl.liquidate(borrower, address(nvda), 10e18, 0);
         vm.stopPrank();
+        assertEq(repaidRaw, 5e18);
 
         assertEq(out, 631_250_000, "5 shares x $125 x 1.01");
         assertEq(usdg.balanceOf(liquidator), 631_250_000);

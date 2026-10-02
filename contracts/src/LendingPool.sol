@@ -139,7 +139,9 @@ contract LendingPool is ERC4626, ReentrancyGuard, ILendingPool {
     // ------------------------------------------------------------------ controller actions
 
     /// @notice Lend raw units to `to`. Reverts past idle liquidity or the utilisation cap.
-    function borrow(uint256 rawAmount, address to) external onlyController nonReentrant {
+    /// @dev Controller-only and checks-effects-interactions, so it carries no reentrancy guard: a flash
+    ///      liquidation repays through `repay` from inside `flashLoan`, which does hold the guard.
+    function borrow(uint256 rawAmount, address to) external onlyController {
         if (rawAmount == 0) revert ZeroAmount();
         uint256 idleNow = idle();
         if (rawAmount > idleNow) revert InsufficientLiquidity(idleNow);
@@ -152,7 +154,8 @@ contract LendingPool is ERC4626, ReentrancyGuard, ILendingPool {
     }
 
     /// @notice Pull raw units back from `from` (which must have approved this pool) and reduce borrows.
-    function repay(uint256 rawAmount, address from) external onlyController nonReentrant {
+    /// @dev No reentrancy guard for the same reason as `borrow`.
+    function repay(uint256 rawAmount, address from) external onlyController {
         if (rawAmount == 0) revert ZeroAmount();
         if (rawAmount > totalBorrows) revert RepayExceedsBorrows(totalBorrows);
         totalBorrows -= rawAmount;
