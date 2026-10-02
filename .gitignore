@@ -28,3 +28,6 @@ coverage/
 # misc
 *.log
 .DS_Store
+
+# stylus build output
+stylus/target/

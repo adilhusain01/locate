@@ -1,0 +1,7 @@
+[workspace]
+
+[workspace.networks.robinhood-testnet]
+endpoint = "https://rpc.testnet.chain.robinhood.com"
+
+[workspace.networks.arbitrum-sepolia]
+endpoint = "https://sepolia-rollup.arbitrum.io/rpc"
