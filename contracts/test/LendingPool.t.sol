@@ -3,10 +3,10 @@ pragma solidity ^0.8.30;
 
 import {Test} from "forge-std/Test.sol";
 import {IERC20} from "@openzeppelin/contracts/token/ERC20/IERC20.sol";
-import {IERC20Errors} from "@openzeppelin/contracts/interfaces/draft-IERC6093.sol";
 import {ERC4626} from "@openzeppelin/contracts/token/ERC20/extensions/ERC4626.sol";
 import {IERC3156FlashBorrower} from "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
 import {LendingPool} from "../src/LendingPool.sol";
+import {ILendingPool} from "../src/interfaces/ILendingPool.sol";
 import {MockStockToken} from "../src/mocks/MockStockToken.sol";
 import {MockUSDG} from "../src/mocks/MockUSDG.sol";
 import {GoodFlashBorrower, StingyFlashBorrower, WrongReturnFlashBorrower} from "./mocks/FlashBorrowers.sol";
@@ -122,7 +122,7 @@ contract LendingPoolTest is Test {
     function test_borrowMovesRawUnitsAndKeepsLenderClaims() public {
         uint256 shares = _deposit(alice, 100e18);
         vm.expectEmit(address(pool));
-        emit LendingPool.Borrow(borrower, 40e18);
+        emit ILendingPool.Borrow(borrower, 40e18);
         pool.borrow(40e18, borrower);
 
         assertEq(token.balanceOf(borrower), 40e18);
@@ -176,7 +176,7 @@ contract LendingPoolTest is Test {
         vm.prank(borrower);
         token.approve(address(pool), 40e18);
         vm.expectEmit(address(pool));
-        emit LendingPool.Repay(borrower, 15e18);
+        emit ILendingPool.Repay(borrower, 15e18);
         pool.repay(15e18, borrower);
         assertEq(pool.totalBorrows(), 25e18);
         assertEq(pool.idle(), 75e18);
@@ -235,7 +235,7 @@ contract LendingPoolTest is Test {
         assertEq(pool.maxFlashLoan(address(token)), 100e18);
 
         vm.expectEmit(address(pool));
-        emit LendingPool.FlashLoan(address(good), 10e18, fee);
+        emit ILendingPool.FlashLoan(address(good), 10e18, fee);
         assertTrue(pool.flashLoan(IERC3156FlashBorrower(address(good)), address(token), 10e18, ""));
 
         assertEq(good.lastAmount(), 10e18);
@@ -321,7 +321,7 @@ contract LendingPoolTest is Test {
         pool.borrow(200e18, borrower);
 
         vm.expectEmit(address(pool));
-        emit LendingPool.WriteOff(40e18);
+        emit ILendingPool.WriteOff(40e18);
         pool.writeOff(40e18);
 
         assertEq(pool.totalBorrows(), 160e18);

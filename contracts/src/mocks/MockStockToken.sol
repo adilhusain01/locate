@@ -47,12 +47,14 @@ contract MockStockToken is
         return _multiplier;
     }
 
+    /// @dev Like the live Stock Token, the last scheduled values stay readable after they take effect; a
+    ///      pending action is one whose `effectiveAt()` is still in the future.
     function newUIMultiplier() external view returns (uint256) {
-        return _isPending() ? _pendingMultiplier : 0;
+        return _pendingEffectiveAt == 0 ? 0 : _pendingMultiplier;
     }
 
     function effectiveAt() external view returns (uint256) {
-        return _isPending() ? _pendingEffectiveAt : 0;
+        return _pendingEffectiveAt;
     }
 
     function toUIAmount(uint256 rawAmount) public view returns (uint256) {
@@ -86,12 +88,8 @@ contract MockStockToken is
         if (effectiveAt_ < block.timestamp) revert InvalidEffectiveAt();
         _settlePending();
         emit UIMultiplierUpdated(_multiplier, newMultiplier, effectiveAt_);
-        if (effectiveAt_ == block.timestamp) {
-            _multiplier = newMultiplier;
-        } else {
-            _pendingMultiplier = newMultiplier;
-            _pendingEffectiveAt = effectiveAt_;
-        }
+        _pendingMultiplier = newMultiplier;
+        _pendingEffectiveAt = effectiveAt_;
     }
 
     function cancelScheduledMultiplier() external onlyOwner {
@@ -137,8 +135,6 @@ contract MockStockToken is
     function _settlePending() internal {
         if (_pendingEffectiveAt != 0 && block.timestamp >= _pendingEffectiveAt) {
             _multiplier = _pendingMultiplier;
-            _pendingMultiplier = 0;
-            _pendingEffectiveAt = 0;
         }
     }
 

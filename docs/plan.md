@@ -1,6 +1,6 @@
 # Locate
 
-Working name (Claude's suggestion, 2026-10-02; alternatives: Shortlist, Rehypo). Locate is an on-chain stock lending and borrowing market for tokenized stocks, starting with Robinhood Chain Stock Tokens. Holders lend tokens they already own and earn a borrow fee. Borrowers post USDG and take tokens to short, hedge, market-make or arbitrage. It is the product behind the recommendation in Arbitrum Open House Singapore Online Buildathon; Adil asked for the complete plan, nothing cut, on 2026-10-02. Status: planned, not started.
+Locate (name chosen by Adil, 2026-10-02) is an on-chain stock lending and borrowing market for tokenized stocks, starting with Robinhood Chain Stock Tokens. Holders lend tokens they already own and earn a borrow fee. Borrowers post USDG and take tokens to short, hedge, market-make or arbitrage. It is the product behind the recommendation in Arbitrum Open House Singapore Online Buildathon; Adil asked for the complete plan, nothing cut, on 2026-10-02. Status: in development since 2026-10-02. Repo: `/root/Projects/locate` on the VPS (GitHub `adilhusain01/locate`, private, once the repo exists and the deploy key below is added).
 
 ## Why it should exist
 
@@ -173,20 +173,27 @@ The idle float and the Sunday volume. Lend NVDA and watch lNVDA and effective sh
 - M2, eight weeks: v2 collateral (stock tokens and lTokens), portfolio margin in the Stylus engine (long one name, short another), Dinari dShares markets on Arbitrum One once their split mechanics and feeds are verified.
 - M3, twelve weeks: term loans (fixed term, fixed fee, the TradFi stock loan), lender recall with a premium, a hard-to-borrow auction where lenders post minimum fees, an institutional API, delegated borrow capacity for agents through EIP-7702 session keys with spend limits, and an x402-gated history API.
 
-## Decisions for Adil
+## Decisions (settled 2026-10-02)
 
-1. Name: Locate (recommended), Shortlist or Rehypo.
-2. Solidity toolchain: Foundry (recommended for fuzz, invariant and fork tests, and `cast` for Stylus calls) or Hardhat 3.
-3. Wallet layer: Privy (recommended: embedded wallets plus gas sponsorship on this chain) or RainbowKit.
-4. Mainnet during the build with tiny caps (recommended; judges can verify real tokens) or testnet only.
-5. Fee unit: tokens (recommended; no oracle in accrual) or USDG.
-6. Solo (recommended; the Rust surface is three small crates and ArbiPic already shipped Stylus) or a Rust partner.
-7. Enter the Singapore edition with checkpoint 1 by 4 October 21:29 IST, or build the full 21 days for the next Open House and the grant track.
+Adil decided: the name is Locate, testnet only wherever possible (mainnet only where a platform has no testnet), build the full scope with nothing cut, and the rest was left to Claude's judgement. Claude's calls, with reasons, are in the repo's `docs/decisions.md`:
+
+- Foundry over Hardhat 3 (fuzz, invariant and fork tests built in; `cast` for Stylus calls).
+- Privy over RainbowKit (embedded wallet from an email login for judges, gas sponsorship, listed by Robinhood Chain's own AA docs).
+- Fees charged in USDG rather than in tokens: lenders see cash yield, borrowers pay out of their USDG collateral, a short stays a fixed number of shares, and USDG touches every flow. Debt in raw units never grows; each pool keeps a USDG reward index.
+- Solo, with Claude Code implementing across Solidity, Rust and TypeScript and an outside reviewer for the Stylus and liquidation code. A Rust partner would mostly cost a prize split.
+- Not entered into the Singapore edition; the target is the next Open House and the grant track.
+
+What "testnet only" changes: the protocol lives on Robinhood Chain testnet (46630) plus an Arbitrum Sepolia mirror. Chainlink equity feeds exist only on mainnet, and the testnet has only unofficial USDG tokens and Uniswap deployments, so the testnet gets Locate's own MockUSDG, its own Uniswap v3 deployment and MockFeeds that a keeper fills with the mainnet Chainlink prices and timestamps (staleness stays real). Mainnet is read-only: fork tests and the price mirror. Checkpoint 4 in the build plan becomes "testnet complete with mirrored prices"; a capped mainnet deployment is a post-review milestone if Adil ever wants one.
+
+## What changed
+
+- 2026-10-02 — Day 1. Toolchain on the VPS: Foundry 1.5.1 was present; installed Rust stable with the wasm target, pnpm 10 via corepack, the GitHub CLI in `~/.local/bin`, and `build-essential` so cargo-stylus can build. Repo scaffolded at `/root/Projects/locate` (README with Getting started, `.env.example`, `.gitignore`, pnpm workspace, Foundry with OpenZeppelin 5.4 and forge-std as submodules). Written: the ERC-8056 interfaces (checked against the EIP text: the event is `TransferWithUIAmount`, interface ids 0xa60bf13d, 0x4bd27648, 0x57854fc3, 0xd890fd71), MockStockToken, MockUSDG, MockFeed with `oraclePaused`, MockSequencerFeed, and LendingPool (ERC-4626 per ticker, raw-unit accounting, controller-only borrow, repay, write-off, USDG reward index with 1e36 precision, ERC-3156 flash loans at 5 bps rounded up, 90 percent utilisation cap, zero-share deposit guard, decimals offset 6). 32 tests written from the requirements before the code; the first run failed, the second passed; three mutation checks (cap removed, reward settlement removed, fee rounding floored) each made the right test fail. A deploy key `~/.ssh/locate_deploy` and SSH alias `github-locate` were created; Adil still has to create the private repo and add the key.
+- 2026-10-02 — Verified on-chain: Stylus is enabled on both Robinhood networks (`stylusVersion()` returns 3), mainnet USDG at `0x5fc5360D0400a0Fd4f2af552ADD042D716F1d168` answers `USDG` with 6 decimals, and a USDG/USD Chainlink feed exists on mainnet at `0x61B7e5650328764B076A108EFF5fa7282a1B9aD2` (closes the open risk below). The Chainlink directory lists 58 feeds on Robinhood mainnet, 35 of them equity feeds in the `us_equities_24/5` category. The Robinhood asset registry API (`https://api.robinhood.com/rhj/assets`) returns 194 tokens with mainnet addresses, multipliers and trading status.
 
 ## Open risks
 
 - Weekend pricing on thin pools remains the main risk; caps tied to depth and the max-of-sources rule contain it but do not remove it.
-- Whether a USDG/USD Chainlink feed exists on Robinhood Chain is unchecked.
+- (Closed 2026-10-02) A USDG/USD Chainlink feed exists on mainnet; the testnet mirror copies it.
 - The sqd.dev address for the shared Stock implementation did not parse as a valid address in the fetch; verify it against the registry before writing the canonical check.
 - Securities lending of tokenized securities may draw regulatory comment even for non-custodial software; the posture above is a start, not an opinion from counsel.
 - The 99 unsubmitted drafts in the Singapore edition were not visible; one could overlap.

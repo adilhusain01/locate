@@ -9,7 +9,9 @@ import {ReentrancyGuard} from "@openzeppelin/contracts/utils/ReentrancyGuard.sol
 import {Math} from "@openzeppelin/contracts/utils/math/Math.sol";
 import {IERC3156FlashBorrower} from "@openzeppelin/contracts/interfaces/IERC3156FlashBorrower.sol";
 import {IERC3156FlashLender} from "@openzeppelin/contracts/interfaces/IERC3156FlashLender.sol";
+import {IERC4626} from "@openzeppelin/contracts/interfaces/IERC4626.sol";
 import {IController} from "./interfaces/IController.sol";
+import {ILendingPool} from "./interfaces/ILendingPool.sol";
 import {IScaledUIAmount} from "./interfaces/IERC8056.sol";
 
 /// @title LendingPool
@@ -19,7 +21,7 @@ import {IScaledUIAmount} from "./interfaces/IERC8056.sol";
 ///         splits and dividends flow to lenders by construction.
 /// @dev    Debt does not grow in token units. Fees are charged in USDG by the Controller, which is why the
 ///         share price only moves on flash-loan fees (up) and write-offs (down).
-contract LendingPool is ERC4626, ReentrancyGuard, IERC3156FlashLender {
+contract LendingPool is ERC4626, ReentrancyGuard, ILendingPool {
     using SafeERC20 for IERC20;
     using Math for uint256;
 
@@ -29,25 +31,18 @@ contract LendingPool is ERC4626, ReentrancyGuard, IERC3156FlashLender {
     bytes32 private constant CALLBACK_SUCCESS = keccak256("ERC3156FlashBorrower.onFlashLoan");
 
     /// @notice The only address allowed to borrow, repay, write off and notify rewards.
-    address public immutable controller;
+    address public immutable override controller;
     /// @notice Utilisation (WAD) that borrows may not exceed, so lenders always keep an exit buffer.
-    uint256 public immutable maxUtilisation;
+    uint256 public immutable override maxUtilisation;
 
     /// @notice Raw units currently lent out.
-    uint256 public totalBorrows;
+    uint256 public override totalBorrows;
     /// @notice Accumulated USDG rewards per share, scaled by REWARD_PRECISION.
     uint256 public rewardPerShareStored;
     /// @notice USDG notified and not yet claimed.
-    uint256 public totalRewardsOwed;
+    uint256 public override totalRewardsOwed;
     mapping(address account => uint256) public userRewardPerSharePaid;
     mapping(address account => uint256) public rewards;
-
-    event Borrow(address indexed to, uint256 rawAmount);
-    event Repay(address indexed from, uint256 rawAmount);
-    event WriteOff(uint256 rawAmount);
-    event FlashLoan(address indexed receiver, uint256 rawAmount, uint256 fee);
-    event RewardNotified(uint256 usdgAmount, uint256 rewardPerShare);
-    event RewardClaimed(address indexed account, address indexed to, uint256 usdgAmount);
 
     error NotController();
     error ZeroAmount();
@@ -84,7 +79,7 @@ contract LendingPool is ERC4626, ReentrancyGuard, IERC3156FlashLender {
     }
 
     /// @inheritdoc ERC4626
-    function totalAssets() public view override returns (uint256) {
+    function totalAssets() public view override(ERC4626, IERC4626) returns (uint256) {
         return idle() + totalBorrows;
     }
 
@@ -123,12 +118,12 @@ contract LendingPool is ERC4626, ReentrancyGuard, IERC3156FlashLender {
     // ------------------------------------------------------------------ ERC-4626 limits
 
     /// @inheritdoc ERC4626
-    function maxWithdraw(address owner) public view override returns (uint256) {
+    function maxWithdraw(address owner) public view override(ERC4626, IERC4626) returns (uint256) {
         return Math.min(super.maxWithdraw(owner), idle());
     }
 
     /// @inheritdoc ERC4626
-    function maxRedeem(address owner) public view override returns (uint256) {
+    function maxRedeem(address owner) public view override(ERC4626, IERC4626) returns (uint256) {
         return Math.min(super.maxRedeem(owner), _convertToShares(idle(), Math.Rounding.Floor));
     }
 

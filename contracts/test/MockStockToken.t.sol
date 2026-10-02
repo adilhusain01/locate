@@ -14,7 +14,9 @@ import {
 
 /// The mock must behave like the ERC-8056 token the protocol relies on. Requirements come from the standard and
 /// Robinhood's Stock Token docs: raw balances never change on a corporate action, the multiplier scales them,
-/// a pending multiplier is visible before it takes effect, transfers carry the UI amount.
+/// a pending multiplier is visible before it takes effect, transfers carry the UI amount. One detail comes from
+/// the live NVDA token on mainnet (read 2026-10-02): `newUIMultiplier()` and `effectiveAt()` keep returning the
+/// last scheduled values after they take effect, so "pending" means `effectiveAt()` is in the future.
 contract MockStockTokenTest is Test {
     MockStockToken token;
     address alice = makeAddr("alice");
@@ -41,7 +43,8 @@ contract MockStockTokenTest is Test {
         assertEq(token.totalSupplyUI(), 200e18);
         assertEq(token.toUIAmount(10e18), 20e18);
         assertEq(token.fromUIAmount(20e18), 10e18);
-        assertEq(token.newUIMultiplier(), 0);
+        assertEq(token.newUIMultiplier(), 2e18, "last scheduled value stays readable");
+        assertEq(token.effectiveAt(), block.timestamp);
     }
 
     function test_pendingMultiplierIsVisibleThenApplies() public {
@@ -58,8 +61,8 @@ contract MockStockTokenTest is Test {
         assertEq(token.uiMultiplier(), 3e18);
         assertEq(token.balanceOfUI(alice), 300e18);
         assertEq(token.balanceOf(alice), 100e18);
-        assertEq(token.newUIMultiplier(), 0);
-        assertEq(token.effectiveAt(), 0);
+        assertEq(token.newUIMultiplier(), 3e18, "stays readable after taking effect, as on mainnet");
+        assertEq(token.effectiveAt(), at);
     }
 
     function test_cancelPendingMultiplier() public {
