@@ -1,0 +1,30 @@
+# dependencies
+node_modules/
+
+# environment
+.env
+.env.*
+!.env.example
+
+# foundry
+contracts/out/
+contracts/cache/
+contracts/broadcast/**/dry-run/
+contracts/lcov.info
+contracts/coverage/
+
+# rust / stylus
+target/
+**/target/
+
+# web, indexer, keepers
+.next/
+.ponder/
+dist/
+.turbo/
+.vercel/
+coverage/
+
+# misc
+*.log
+.DS_Store
