@@ -30,6 +30,7 @@ contract MockStockToken is
     uint256 public faucetCooldown = 1 days;
     mapping(address account => uint256) public lastFaucetAt;
 
+    bool private _oraclePaused;
     uint256 private _multiplier = ONE;
     uint256 private _pendingMultiplier;
     uint256 private _pendingEffectiveAt;
@@ -101,6 +102,15 @@ contract MockStockToken is
 
     function pause() external onlyOwner {
         _pause();
+    }
+
+    /// @notice Live Stock Tokens expose this flag while a corporate action is being processed.
+    function oraclePaused() external view returns (bool) {
+        return _oraclePaused;
+    }
+
+    function setOraclePaused(bool paused_) external onlyOwner {
+        _oraclePaused = paused_;
     }
 
     function unpause() external onlyOwner {
