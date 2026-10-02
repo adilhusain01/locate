@@ -23,12 +23,12 @@ import {MockSequencerFeed} from "../src/mocks/MockSequencerFeed.sol";
 
 /// @notice Shared deployment logic for the testnet script and the deployment test. Everything a testnet needs:
 ///         mock USDG, mock stock tokens with mirrored mainnet prices, feeds, calendar, router, engine,
-///         controller, one pool per ticker, the periphery and seeded Uniswap v3 pools.
+///         controller, one pool per ticker, the periphery and Uniswap v3 pools seeded with 1,000,000 USDG a side.
 abstract contract LocateDeployer {
     Vm internal constant vmDeployer = Vm(address(uint160(uint256(keccak256("hevm cheat code")))));
 
     uint24 internal constant POOL_FEE = 3000;
-    uint256 internal constant SEED_USDG_PER_MARKET = 200_000e6;
+    uint256 internal constant SEED_USDG_PER_MARKET = 1_000_000e6; // deep enough that a 10-share short moves the pool well under 1 percent
     uint256 internal constant LENDER_SEED_TOKENS = 1_000e18;
 
     struct MarketConfig {
@@ -169,7 +169,7 @@ abstract contract LocateDeployer {
     function _seedUniswap(Deployment memory d, uint256 i, MockStockToken stock, uint256 price8, address owner)
         internal
     {
-        uint256 tokenAmount = SEED_USDG_PER_MARKET * 1e12 * 1e8 / price8; // tokens worth 200k USDG
+        uint256 tokenAmount = SEED_USDG_PER_MARKET * 1e12 * 1e8 / price8; // tokens worth the USDG seed
         stock.mint(owner, tokenAmount);
         MockUSDG(d.usdg).mint(owner, SEED_USDG_PER_MARKET);
         stock.approve(d.seeder, tokenAmount);

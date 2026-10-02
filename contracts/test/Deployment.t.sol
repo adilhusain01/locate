@@ -45,10 +45,12 @@ contract DeploymentTest is Test, LocateDeployer {
         uint256 price = ctl.oracle().quote(nvda).priceWad;
         bytes memory path = abi.encodePacked(nvda, uint24(3000), d.usdg);
 
-        usdg.mint(trader, 20_000e6);
+        // 1,300 USDG of margin for a ~2,375 USDG short: the proceeds take it past the 1.5x initial ratio,
+        // and a 30 percent rally takes it below liquidation
+        usdg.mint(trader, 1_300e6);
         vm.startPrank(trader);
-        usdg.approve(d.controller, 20_000e6);
-        ctl.depositCollateral(20_000e6, trader);
+        usdg.approve(d.controller, 1_300e6);
+        ctl.depositCollateral(1_300e6, trader);
         ctl.setOperator(d.shortRouter, true);
         uint256 proceeds = ShortRouter(d.shortRouter).short(nvda, 10e18, path, 0);
         vm.stopPrank();
@@ -60,13 +62,13 @@ contract DeploymentTest is Test, LocateDeployer {
         assertLt(ctl.healthFactor(trader), 1e18);
         vm.prank(keeper);
         uint256 profit = Liquidator(d.liquidator).liquidateWithFlash(trader, nvda, 5e18, path, 1);
-        assertGt(profit, 0);
+        assertGt(profit, 300e6, "paid at 130 percent by the auction, bought near 100 percent on the pool");
         assertEq(ctl.positionOf(trader, nvda), 5e18);
 
-        // the trader covers the rest
+        // the trader covers the rest once the print comes back
         MockFeed(d.feeds[0]).setAnswer(int256(price / 1e10), block.timestamp);
         vm.prank(trader);
-        ShortRouter(d.shortRouter).cover(nvda, 5e18, path, 10_000e6);
+        ShortRouter(d.shortRouter).cover(nvda, 5e18, path, 1_500e6);
         assertEq(ctl.positionOf(trader, nvda), 0);
     }
 }
