@@ -9,6 +9,7 @@ WorkingDirectory=/root/Projects/locate/apps/indexer
 EnvironmentFile=/root/Projects/locate/.env
 Environment=PONDER_RPC_URL_46630=https://rpc.testnet.chain.robinhood.com
 Environment=PORT=42069
+Environment=DATABASE_SCHEMA=locate
 ExecStart=/usr/local/bin/pnpm ponder start --port 42069 --hostname 127.0.0.1
 Restart=always
 RestartSec=10
