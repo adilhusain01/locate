@@ -4,7 +4,7 @@ Addresses are written by `contracts/script/DeployTestnet.s.sol` to `contracts/de
 
 | Network | Chain id | Status |
 |---|---|---|
-| Robinhood Chain testnet | 46630 | not deployed yet: the deployer needs testnet ETH from https://faucet.testnet.chain.robinhood.com/ |
+| Robinhood Chain testnet | 46630 | not deployed yet: the deployer needs testnet ETH from https://faucet.testnet.chain.robinhood.com/. Use https://robinhood-sepolia-rpc.publicnode.com or https://robinhood-testnet.drpc.org for Stylus activation checks; the official public RPC refuses them. |
 | Arbitrum Sepolia | 421614 | not deployed yet |
 | Robinhood Chain mainnet | 4663 | read-only (fork tests and the price mirror) |
 
