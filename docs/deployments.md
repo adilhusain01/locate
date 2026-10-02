@@ -61,7 +61,7 @@ Markets. The first nine are Locate mocks priced from the mainnet feeds; AMD, AMZ
 
 ## Arbitrum Sepolia (421614), deployed 2026-10-02
 
-Mirror of the Robinhood testnet stack with the nine mock markets (the faucet Stock Tokens only exist on Robinhood Chain). The Controller runs on the Solidity oracle router and RiskMathRef here: the public Arbitrum Sepolia RPCs (official, publicnode, dRPC) reject the simulated activation call `cargo stylus` needs, so the Stylus contracts wait for an RPC with state override support (an Alchemy or Infura key). Deployer and owner `0x610FdB41DA83138615C317c89fd9EB09271a46fe`, keeper `0x319a9B7EA619Dd52c799209c111A5c348c9a3957`, deployment block 315039952.
+Mirror of the Robinhood testnet stack with the nine mock markets (the faucet Stock Tokens only exist on Robinhood Chain). The Controller runs on the Solidity oracle router and RiskMathRef here: the public Arbitrum Sepolia RPCs (official, publicnode, dRPC) reject the simulated activation call `cargo stylus` needs, so the Stylus contracts wait for an RPC with state override support (an Alchemy or Infura key). Deployer and owner `0x610FdB41DA83138615C317c89fd9EB09271a46fe`, keeper `0x319a9B7EA619Dd52c799209c111A5c348c9a3957`, Blockscout verified three contracts and then rate-limited the rest ("Too many requests"); re-run `forge verify-contract --verifier blockscout --verifier-url https://arbitrum-sepolia.blockscout.com/api/` in slow batches for the others. Deployment block 315039952.
 
 | Contract | Address |
 |---|---|
