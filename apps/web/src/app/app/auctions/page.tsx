@@ -1,6 +1,9 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
+// Re-render at most every 15 seconds whatever the fetch did at build time, so the page follows the indexer.
+export const revalidate = 15;
+
 type Account = { address: string; auctionOpenSince: string | null; lastSeen: string };
 
 async function openAuctions(): Promise<Account[] | null> {
