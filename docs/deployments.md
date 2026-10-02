@@ -1,5 +1,7 @@
 # Deployments
 
+Web app: https://locate-pi.vercel.app (Vercel project `locate`, root directory `apps/web`, deployed from the repo root with the Vercel CLI; Deployment Protection is off so judges can open it). It talks to the Robinhood Chain testnet deployment below.
+
 Addresses are written by `contracts/script/DeployTestnet.s.sol` to `contracts/deployments/<chainid>.json`.
 
 | Network | Chain id | Status |
