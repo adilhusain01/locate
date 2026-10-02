@@ -1,12 +1,7 @@
-# Locate indexer: append to /etc/caddy/Caddyfile, then
-#   caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy
+# Locate indexer (/root/Projects/locate/apps/indexer): ponder start under systemd on 127.0.0.1:42069.
+# Ponder sends its own CORS headers, so Caddy only terminates TLS and compresses.
 # DNS first: A record locate-indexer.adilhusain.xyz -> 13.140.56.191, AAAA -> 2400:d321:2360:5616::1
 locate-indexer.adilhusain.xyz {
 	encode zstd gzip
-	header Access-Control-Allow-Origin "*"
-	header Access-Control-Allow-Headers "content-type"
-	header Access-Control-Allow-Methods "GET, POST, OPTIONS"
-	@options method OPTIONS
-	respond @options 204
 	reverse_proxy 127.0.0.1:42069
 }

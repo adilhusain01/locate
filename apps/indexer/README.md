@@ -22,7 +22,7 @@ systemctl enable --now locate-indexer
 curl -s http://127.0.0.1:42069/markets | head -c 300
 ```
 
-3. Caddy: back up `/etc/caddy/Caddyfile`, append `deploy/Caddyfile.snippet` to it, then `caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy`. The file's `default_bind` already limits the site to the public addresses.
+3. Caddy: back up `/etc/caddy/Caddyfile`, append `deploy/Caddyfile.snippet` to it, then `caddy validate --config /etc/caddy/Caddyfile && systemctl reload caddy`. The file's `default_bind` already limits the site to the public addresses. Do not add CORS headers in Caddy: Ponder sends `Access-Control-Allow-Origin: *` itself, and a second copy makes the header read `*, *`, which browsers reject.
 4. Tell the app: `vercel env add NEXT_PUBLIC_INDEXER_URL production` with `https://locate-indexer.adilhusain.xyz`, then redeploy. The auctions page and the activity views pick it up.
 
 Logs: `/var/log/locate-indexer.log`. Resync from scratch: stop the service, delete `.ponder/`, start it again (a few minutes on testnet).
