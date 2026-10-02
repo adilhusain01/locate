@@ -6,9 +6,10 @@ import { createPublicClient, createWalletClient, http, type Address, type Hex } 
 import { privateKeyToAccount } from "viem/accounts";
 import { calendarAbi, feedAbi, poolAbi, routerAbi } from "./stylus-abi.ts";
 
-const RPC = process.env.ROBINHOOD_TESTNET_RPC_URL ?? "https://rpc.testnet.chain.robinhood.com";
-const chain = { id: 46630, name: "Robinhood Chain Testnet", nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 }, rpcUrls: { default: { http: [RPC] } } } as const;
-const d = JSON.parse(readFileSync("contracts/deployments/46630.json", "utf8"));
+const CHAIN_ID = Number(process.env.CHAIN_ID ?? 46630);
+const RPC = process.env.RPC_URL ?? (CHAIN_ID === 421614 ? "https://sepolia-rollup.arbitrum.io/rpc" : process.env.ROBINHOOD_TESTNET_RPC_URL ?? "https://rpc.testnet.chain.robinhood.com");
+const chain = { id: CHAIN_ID, name: `chain-${CHAIN_ID}`, nativeCurrency: { name: "ETH", symbol: "ETH", decimals: 18 }, rpcUrls: { default: { http: [RPC] } } } as const;
+const d = JSON.parse(readFileSync(`contracts/deployments/${CHAIN_ID}.json`, "utf8"));
 const account = privateKeyToAccount(process.env.DEPLOYER_PRIVATE_KEY as Hex);
 const pub = createPublicClient({ chain, transport: http(RPC) });
 const wallet = createWalletClient({ account, chain, transport: http(RPC) });
