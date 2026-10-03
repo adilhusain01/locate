@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { Schibsted_Grotesk, Geist_Mono } from "next/font/google";
+import { Bricolage_Grotesque, Onest, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
-const sans = Schibsted_Grotesk({ variable: "--font-sans", subsets: ["latin"], weight: ["400", "500", "600", "700"] });
+const display = Bricolage_Grotesque({ variable: "--font-display", subsets: ["latin"], axes: ["opsz", "wdth"] });
+const sans = Onest({ variable: "--font-sans", subsets: ["latin"] });
 const mono = Geist_Mono({ variable: "--font-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -13,7 +14,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${sans.variable} ${mono.variable} min-h-dvh bg-background font-sans text-foreground antialiased`}>{children}</body>
+      <body className={`${display.variable} ${sans.variable} ${mono.variable} min-h-dvh bg-background font-sans text-foreground antialiased`}>{children}</body>
     </html>
   );
 }

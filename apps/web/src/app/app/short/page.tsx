@@ -44,22 +44,22 @@ function ShortInner() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Short</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Post USDG, borrow the token, sell it in one transaction. The proceeds count as margin.</p>
+          <h1 className="text-4xl font-bold tracking-[-0.025em] sm:text-5xl">Short</h1>
+          <p className="mt-2 text-base text-muted-foreground">Post USDG, borrow the token, sell it in one transaction. The proceeds count as margin.</p>
         </div>
         <MarketPicker value={ticker} onChange={setTicker} />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card><CardHeader className="pb-2"><CardDescription>Collateral</CardDescription><CardTitle className="text-xl tabular-nums">{fmtUsdg(me.collateral)}</CardTitle></CardHeader><CardContent className="text-xs text-muted-foreground">Fees pending {fmtUsdg(me.pendingFees)}</CardContent></Card>
-        <Card><CardHeader className="pb-2"><CardDescription>Health</CardDescription><CardTitle className="text-xl tabular-nums">{fmtHealth(me.health)}</CardTitle></CardHeader><CardContent className="text-xs text-muted-foreground">Liquidation below 1.00</CardContent></Card>
-        <Card><CardHeader className="pb-2"><CardDescription>{ticker} short</CardDescription><CardTitle className="text-xl tabular-nums">{fmtToken(debt, ticker)}</CardTitle></CardHeader><CardContent className="text-xs text-muted-foreground">Worth {fmtUsdWad((debt * price) / WAD)}</CardContent></Card>
-        <Card><CardHeader className="pb-2"><CardDescription>{ticker} price</CardDescription><CardTitle className="text-xl tabular-nums">{fmtUsdWad(price)}</CardTitle></CardHeader><CardContent className="text-xs text-muted-foreground">Borrow APR {row ? (Number(row.borrowRateWad) / 1e16).toFixed(2) : "…"}%</CardContent></Card>
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+        <Card><CardHeader className="pb-2"><CardDescription>Collateral</CardDescription><CardTitle className="text-2xl font-bold tracking-tight tabular-nums sm:text-3xl">{fmtUsdg(me.collateral)}</CardTitle></CardHeader><CardContent className="text-xs text-muted-foreground">Fees pending {fmtUsdg(me.pendingFees)}</CardContent></Card>
+        <Card><CardHeader className="pb-2"><CardDescription>Health</CardDescription><CardTitle className="text-2xl font-bold tracking-tight tabular-nums sm:text-3xl">{fmtHealth(me.health)}</CardTitle></CardHeader><CardContent className="text-xs text-muted-foreground">Liquidation below 1.00</CardContent></Card>
+        <Card><CardHeader className="pb-2"><CardDescription>{ticker} short</CardDescription><CardTitle className="text-2xl font-bold tracking-tight tabular-nums sm:text-3xl">{fmtToken(debt, ticker)}</CardTitle></CardHeader><CardContent className="text-xs text-muted-foreground">Worth {fmtUsdWad((debt * price) / WAD)}</CardContent></Card>
+        <Card><CardHeader className="pb-2"><CardDescription>{ticker} price</CardDescription><CardTitle className="text-2xl font-bold tracking-tight tabular-nums sm:text-3xl">{fmtUsdWad(price)}</CardTitle></CardHeader><CardContent className="text-xs text-muted-foreground">Borrow APR {row ? (Number(row.borrowRateWad) / 1e16).toFixed(2) : "…"}%</CardContent></Card>
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
         <Card>
-          <CardHeader><CardTitle className="text-base">Collateral</CardTitle><CardDescription>USDG in wallet {fmtUsdg(me.usdgBalance)}</CardDescription></CardHeader>
+          <CardHeader><CardTitle className="text-xl font-semibold">Collateral</CardTitle><CardDescription>USDG in wallet {fmtUsdg(me.usdgBalance)}</CardDescription></CardHeader>
           <CardContent className="space-y-4">
             <AmountField id="cin" label="Deposit" unit="USDG" value={collateralIn} onChange={setCollateralIn} max={me.usdgBalance !== undefined ? formatUnits(me.usdgBalance, 6) : undefined} />
             <div className="flex justify-end">
@@ -76,9 +76,9 @@ function ShortInner() {
           </CardContent>
         </Card>
 
-        <Card>
+        <Card className="wash-short">
           <CardHeader>
-            <CardTitle className="text-base">Short {ticker}</CardTitle>
+            <CardTitle className="text-xl font-semibold">Short {ticker}</CardTitle>
             <CardDescription>Needs the router approved once as your operator. Sold on Uniswap with 1 percent slippage allowance.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

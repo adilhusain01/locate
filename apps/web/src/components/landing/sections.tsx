@@ -2,11 +2,11 @@ import Link from "next/link";
 
 export function Section({ id, title, lead, children }: { id: string; title: string; lead?: string; children: React.ReactNode }) {
   return (
-    <section id={id} className="scroll-mt-20 border-t py-14 sm:py-20">
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.4fr)] lg:gap-12">
+    <section id={id} className="scroll-mt-20 border-t py-16 sm:py-24">
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.2fr)] lg:gap-16">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">{title}</h2>
-          {lead && <p className="mt-4 max-w-prose text-base leading-relaxed text-muted-foreground">{lead}</p>}
+          <h2 className="text-3xl font-bold tracking-[-0.025em] sm:text-4xl lg:text-5xl">{title}</h2>
+          {lead && <p className="mt-5 max-w-prose text-lg leading-relaxed text-muted-foreground">{lead}</p>}
         </div>
         <div className="min-w-0">{children}</div>
       </div>
@@ -17,12 +17,12 @@ export function Section({ id, title, lead, children }: { id: string; title: stri
 // The long-form mechanics stay one click away so the diagrams carry the page.
 export function Details({ children, summary = "Read the mechanics" }: { children: React.ReactNode; summary?: string }) {
   return (
-    <details className="group mt-6 max-w-prose rounded-sm border bg-card">
-      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-3 text-sm font-medium outline-offset-2 focus-visible:outline-2 focus-visible:outline-ring [&::-webkit-details-marker]:hidden">
+    <details className="group mt-6 max-w-prose overflow-hidden rounded-xl border card-wash wash-cobalt">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-[15px] font-medium outline-offset-2 focus-visible:outline-2 focus-visible:outline-ring [&::-webkit-details-marker]:hidden">
         {summary}
         <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4 text-muted-foreground transition-transform duration-200 ease-out group-open:rotate-180"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.5" /></svg>
       </summary>
-      <div className="space-y-4 border-t px-4 py-4 text-[15px] leading-relaxed">{children}</div>
+      <div className="space-y-4 border-t px-5 py-5 text-base leading-relaxed">{children}</div>
     </details>
   );
 }
@@ -37,18 +37,18 @@ export function Header() {
   ];
   return (
     <header className="border-b bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/80 sticky top-0 z-20">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
+      <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-4 px-5 sm:px-8 lg:px-12 py-3">
         <div className="flex min-w-0 items-center gap-6">
-          <Link href="/" className="shrink-0 text-base font-semibold tracking-tight">Locate</Link>
+          <Link href="/" className="shrink-0 font-display text-lg font-bold tracking-tight">Locate</Link>
           <nav className="-mx-1 hidden gap-1 px-1 text-sm md:flex">
             {anchors.map(([href, label]) => (
-              <a key={href} href={href} className="rounded-sm px-2.5 py-1.5 text-muted-foreground transition-colors hover:text-foreground">{label}</a>
+              <a key={href} href={href} className="rounded-md px-2.5 py-1.5 text-muted-foreground transition-colors hover:text-foreground">{label}</a>
             ))}
           </nav>
         </div>
         <div className="flex items-center gap-2">
-          <a href="https://github.com/adilhusain01/locate" className="hidden rounded-sm px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground sm:inline" target="_blank" rel="noreferrer">GitHub</a>
-          <Link href="/app" className="key inline-flex h-9 items-center rounded-sm bg-primary px-4 text-sm font-medium text-primary-foreground">Open app</Link>
+          <a href="https://github.com/adilhusain01/locate" className="hidden rounded-md px-2.5 py-1.5 text-sm text-muted-foreground hover:text-foreground sm:inline" target="_blank" rel="noreferrer">GitHub</a>
+          <Link href="/app" className="key inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground">Open app</Link>
         </div>
       </div>
     </header>

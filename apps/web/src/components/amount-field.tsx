@@ -26,7 +26,7 @@ export function AmountField({
       <Label htmlFor={id}>{label}</Label>
       <div className="flex gap-2">
         <Input id={id} inputMode="decimal" value={value} onChange={(e) => onChange(e.target.value)} placeholder="0.0" />
-        <span className="inline-flex items-center rounded-sm border px-2 text-sm text-muted-foreground">{unit}</span>
+        <span className="inline-flex items-center rounded-md border px-2 text-sm text-muted-foreground">{unit}</span>
         {max !== undefined && (
           <Button type="button" variant="outline" size="sm" className="h-9" onClick={() => onChange(max)}>Max</Button>
         )}

@@ -31,25 +31,25 @@ function LendInner() {
     <div className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Lend</h1>
-          <p className="mt-1 text-sm text-muted-foreground">Deposit a stock token, keep its price and dividends, earn the borrow fee in USDG.</p>
+          <h1 className="text-4xl font-bold tracking-[-0.025em] sm:text-5xl">Lend</h1>
+          <p className="mt-2 text-base text-muted-foreground">Deposit a stock token, keep its price and dividends, earn the borrow fee in USDG.</p>
         </div>
         <MarketPicker value={ticker} onChange={setTicker} />
       </div>
 
-      <div className="grid gap-4 md:grid-cols-3">
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-4">
         <Card>
-          <CardHeader className="pb-2"><CardDescription>Supply APY</CardDescription><CardTitle className="text-2xl tabular-nums">{fmtPctWad(row?.supplyRateWad)}</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardDescription>Supply APY</CardDescription><CardTitle className="text-2xl font-bold tracking-tight tabular-nums sm:text-3xl">{fmtPctWad(row?.supplyRateWad)}</CardTitle></CardHeader>
           <CardContent className="text-xs text-muted-foreground">Borrow APR {fmtPctWad(row?.borrowRateWad)} at {fmtPctWad(row?.utilisation)} utilisation</CardContent>
         </Card>
         <Card>
-          <CardHeader className="pb-2"><CardDescription>Your position</CardDescription><CardTitle className="text-2xl tabular-nums">{fmtToken(pos.maxWithdraw, ticker)}</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardDescription>Your position</CardDescription><CardTitle className="text-2xl font-bold tracking-tight tabular-nums sm:text-3xl">{fmtToken(pos.maxWithdraw, ticker)}</CardTitle></CardHeader>
           <CardContent className="text-xs text-muted-foreground">
             {pos.effectiveShares !== undefined && `${formatUnits(pos.effectiveShares, 18)} effective shares at multiplier ${row ? (Number(row.uiMultiplier) / 1e18).toFixed(6) : "…"}`}
           </CardContent>
         </Card>
         <Card>
-          <CardHeader className="pb-2"><CardDescription>Claimable yield</CardDescription><CardTitle className="text-2xl tabular-nums">{fmtUsdg(pos.claimable)}</CardTitle></CardHeader>
+          <CardHeader className="pb-2"><CardDescription>Claimable yield</CardDescription><CardTitle className="text-2xl font-bold tracking-tight tabular-nums sm:text-3xl">{fmtUsdg(pos.claimable)}</CardTitle></CardHeader>
           <CardContent>
             <TxButton
               label="Claim USDG"
@@ -63,8 +63,8 @@ function LendInner() {
       </div>
 
       <div className="grid gap-4 md:grid-cols-2">
-        <Card>
-          <CardHeader><CardTitle className="text-base">Deposit {ticker}</CardTitle><CardDescription>Wallet balance {fmtToken(pos.walletBalance, ticker)}</CardDescription></CardHeader>
+        <Card className="wash-lend">
+          <CardHeader><CardTitle className="text-xl font-semibold">Deposit {ticker}</CardTitle><CardDescription>Wallet balance {fmtToken(pos.walletBalance, ticker)}</CardDescription></CardHeader>
           <CardContent className="space-y-4">
             <AmountField id="deposit" label="Amount" unit={ticker} value={depositAmount} onChange={setDepositAmount} max={pos.walletBalance !== undefined ? formatUnits(pos.walletBalance, 18) : undefined} />
             <div className="flex justify-end gap-2">
@@ -77,7 +77,7 @@ function LendInner() {
           </CardContent>
         </Card>
         <Card>
-          <CardHeader><CardTitle className="text-base">Withdraw {ticker}</CardTitle><CardDescription>Up to the pool&apos;s idle liquidity: {fmtToken(row?.idle, ticker)} free right now</CardDescription></CardHeader>
+          <CardHeader><CardTitle className="text-xl font-semibold">Withdraw {ticker}</CardTitle><CardDescription>Up to the pool&apos;s idle liquidity: {fmtToken(row?.idle, ticker)} free right now</CardDescription></CardHeader>
           <CardContent className="space-y-4">
             <AmountField id="withdraw" label="Amount" unit={ticker} value={withdrawAmount} onChange={setWithdrawAmount} max={pos.maxWithdraw !== undefined ? formatUnits(pos.maxWithdraw, 18) : undefined} />
             <div className="flex justify-end">

@@ -28,12 +28,12 @@ export default function Landing() {
     <>
       <Header />
       <Hero />
-      <main className="mx-auto w-full max-w-6xl px-4">
+      <main className="mx-auto w-full max-w-[1440px] px-5 sm:px-8 lg:px-12">
         <section className="py-14 sm:py-20">
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.4fr)] lg:gap-12">
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,2.2fr)] lg:gap-16">
             <div>
-              <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Live on the testnet</h2>
-              <p className="mt-4 max-w-prose text-base leading-relaxed text-muted-foreground">Fourteen markets read straight from Robinhood Chain testnet. Every ticker publishes its borrow rate, a short interest signal tokenized stocks did not have.</p>
+              <h2 className="text-3xl font-bold tracking-[-0.025em] sm:text-4xl lg:text-5xl">Live on the testnet</h2>
+              <p className="mt-5 max-w-prose text-lg leading-relaxed text-muted-foreground">Fourteen markets read straight from Robinhood Chain testnet. Every ticker publishes its borrow rate, a short interest signal tokenized stocks did not have.</p>
               <div className="mt-6"><LiveTicket /></div>
             </div>
             <div className="min-w-0"><LiveMarkets /></div>
@@ -46,13 +46,13 @@ export default function Landing() {
             <p>A lender deposits NVDA and receives lNVDA shares. The pool lends raw units to borrowers up to 90 percent utilisation and keeps the rest idle so lenders can always leave. The fee a borrower pays accrues in USDG against the borrower&apos;s collateral and is credited to the pool&apos;s shareholders as it accrues; a lender claims it whenever they like.</p>
             <p>A borrower deposits USDG once and can borrow any listed ticker against it. The initial ratio is 1.5 times the debt value for the large names and 2 times for the thinner ones; liquidation starts at 1.25 and 1.5 times. One account can hold several shorts, and the health factor adds them up.</p>
           </Details>
-          <h3 className="mt-12 text-lg font-semibold tracking-tight">A short, step by step</h3>
+          <h3 className="mt-14 text-2xl font-semibold tracking-[-0.02em]">A short, step by step</h3>
           <ShortSequence />
           <Details>
             <p>The ShortRouter is an operator the trader approves once. It borrows through a deferred-check call: the Controller hands the tokens over, lets the router sell them on Uniswap and deposit the USDG, and only then checks the ratio. The whole thing reverts if the ratio is missed, so nothing half-happens.</p>
           </Details>
-          <h3 className="mt-12 text-lg font-semibold tracking-tight">Corporate actions cost no code</h3>
-          <div className="mt-6 overflow-x-auto rounded-sm border">
+          <h3 className="mt-14 text-2xl font-semibold tracking-[-0.02em]">Corporate actions cost no code</h3>
+          <div className="mt-6 overflow-x-auto rounded-xl border bg-card">
             <table className="w-full min-w-[520px] text-sm">
               <thead className="bg-muted/60 text-left text-xs text-muted-foreground"><tr><th className="px-3 py-2 font-medium">A 2-for-1 split</th><th className="px-3 py-2 text-right font-medium">Before</th><th className="px-3 py-2 text-right font-medium">After</th></tr></thead>
               <tbody>{corporateAction.map(([k, a, b]) => (<tr key={k} className="border-t"><td className="px-3 py-2">{k}</td><td className="px-3 py-2 text-right font-mono tabular">{a}</td><td className="px-3 py-2 text-right font-mono tabular">{b}</td></tr>))}</tbody>
@@ -82,7 +82,7 @@ export default function Landing() {
 
         <Section id="stylus" title="What runs on Stylus" lead="Two contracts do the arithmetic the Controller depends on every time money moves: the risk engine and the oracle router. Both are Rust, compiled to WebAssembly and activated on Robinhood Chain.">
           <StylusArchitecture />
-          <dl className="mt-8 grid gap-px overflow-hidden rounded-sm border bg-border sm:grid-cols-3">
+          <dl className="mt-8 grid gap-px overflow-hidden rounded-xl border bg-border sm:grid-cols-3">
             {[
               ["14.1 KB", "risk engine, compressed"],
               ["29.6 KB", "oracle router, two fragments"],
@@ -91,7 +91,7 @@ export default function Landing() {
               ["6", "invariants over 8,192 random calls each"],
               ["17", "Rust unit tests"],
             ].map(([n, l]) => (
-              <div key={l} className="bg-card p-4"><dt className="font-mono tabular text-2xl">{n}</dt><dd className="mt-1 text-sm text-muted-foreground">{l}</dd></div>
+              <div key={l} className="card-wash wash-cobalt p-5"><dt className="font-display tabular text-4xl font-bold tracking-tight">{n}</dt><dd className="mt-1 text-sm text-muted-foreground">{l}</dd></div>
             ))}
           </dl>
           <Details>
@@ -101,7 +101,7 @@ export default function Landing() {
         </Section>
 
         <Section id="safety" title="Where it can go wrong, and what stops it" lead="The threat model is written down with the controls that answer each risk and a self-audit checklist that has to be ticked before any mainnet deployment.">
-          <div className="overflow-x-auto rounded-sm border">
+          <div className="overflow-x-auto rounded-xl border bg-card">
             <table className="w-full min-w-[560px] text-sm">
               <thead className="bg-muted/60 text-left text-xs text-muted-foreground"><tr><th className="px-3 py-2 font-medium">Risk</th><th className="px-3 py-2 font-medium">Control</th></tr></thead>
               <tbody>{safety.map(([k, v]) => (<tr key={k} className="border-t align-top"><td className="px-3 py-2 font-medium">{k}</td><td className="px-3 py-2 text-muted-foreground">{v}</td></tr>))}</tbody>
@@ -113,12 +113,12 @@ export default function Landing() {
         </Section>
 
         <section className="border-t py-14 sm:py-20">
-          <div className="rounded-sm border bg-card p-6 sm:p-10">
-            <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">Try it on the testnet</h2>
+          <div className="rounded-2xl border card-wash wash-cobalt p-8 sm:p-14">
+            <h2 className="text-3xl font-bold tracking-[-0.025em] sm:text-5xl">Try it on the testnet</h2>
             <p className="mt-3 max-w-prose text-muted-foreground">Sign in with an email or a wallet, take mock USDG from the faucet, lend a token or short one. Robinhood&apos;s own faucet hands out ETH and the real AMD, AMZN, NFLX, PLTR and TSLA tokens that Locate lists.</p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link href="/app" className="key inline-flex h-11 items-center rounded-sm bg-primary px-5 text-sm font-medium text-primary-foreground">Open the app</Link>
-              <Link href="/app/faucet" className="inline-flex h-11 items-center rounded-sm border bg-background px-5 text-sm font-medium">Get testnet tokens</Link>
+              <Link href="/app" className="key inline-flex h-11 items-center rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground">Open the app</Link>
+              <Link href="/app/faucet" className="inline-flex h-11 items-center rounded-md border bg-background px-5 text-sm font-medium">Get testnet tokens</Link>
             </div>
           </div>
         </section>

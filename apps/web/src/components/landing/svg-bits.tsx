@@ -39,11 +39,11 @@ export function Node({
   const cy = y + h / 2;
   return (
     <g>
-      <rect x={x} y={y} width={w} height={h} rx={4} fill={T.paper} />
-      <rect x={x} y={y} width={w} height={h} rx={4} fill={f.fill} stroke={f.stroke} strokeWidth={1} strokeDasharray={f.dash} />
+      <rect x={x} y={y} width={w} height={h} rx={12} fill={T.paper} />
+      <rect x={x} y={y} width={w} height={h} rx={12} fill={f.fill} stroke={f.stroke} strokeWidth={1} strokeDasharray={f.dash} />
       {tag && (
         <>
-          <rect x={x + 8} y={y + 6} width={tag.length * 6 + 10} height={12} rx={2} fill="transparent" stroke={f.stroke} strokeOpacity={0.4} strokeWidth={0.8} />
+          <rect x={x + 8} y={y + 6} width={tag.length * 6 + 10} height={12} rx={6} fill="transparent" stroke={f.stroke} strokeOpacity={0.4} strokeWidth={0.8} />
           <text x={x + 13 + tag.length * 3} y={y + 15} fill={f.stroke} fillOpacity={0.85} fontSize={7} fontFamily="var(--font-mono)" textAnchor="middle" letterSpacing="0.08em">{tag}</text>
         </>
       )}
@@ -59,7 +59,7 @@ export function Label({ x, y, text, tone = T.soft, anchor = "middle" }: { x: num
   const rx = anchor === "middle" ? x - w / 2 : anchor === "start" ? x - 4 : x - w + 4;
   return (
     <g>
-      <rect x={rx} y={y - 9} width={w} height={12} rx={2} fill={T.paper} />
+      <rect x={rx} y={y - 9} width={w} height={12} rx={4} fill={T.paper} />
       <text x={x} y={y} fill={tone} fontSize={8} fontFamily="var(--font-mono)" textAnchor={anchor} letterSpacing="0.04em">{text}</text>
     </g>
   );
@@ -80,7 +80,7 @@ export function Legend({ items }: { items: { swatch: string; label: string; dash
 
 export function Figure({ children, caption, minWidth = 640 }: { children: React.ReactNode; caption?: string; minWidth?: number }) {
   return (
-    <figure className="mt-6">
+    <figure className="mt-6 rounded-2xl border card-wash p-4 sm:p-6">
       <div className="overflow-x-auto">
         <div style={{ minWidth }}>{children}</div>
       </div>

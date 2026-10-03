@@ -18,13 +18,13 @@ export function Nav() {
   const pathname = usePathname();
   return (
     <header className="border-b bg-background">
-      <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-4 py-3">
-        <div className="flex min-w-0 items-center gap-6">
-          <Link href="/" className="shrink-0 text-base font-semibold tracking-tight">
+      <div className="mx-auto flex max-w-[1440px] flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 sm:px-8 lg:px-12 py-3">
+        <div className="contents min-w-0 items-center gap-6 md:flex">
+          <Link href="/" className="shrink-0 font-display text-lg font-bold tracking-tight">
             Locate
           </Link>
           <span className="hidden text-xs text-muted-foreground sm:inline">Robinhood Chain testnet</span>
-          <nav className="-mx-1 flex gap-1 overflow-x-auto px-1 text-sm">
+          <nav className="order-last -mx-1 flex w-full gap-1 overflow-x-auto px-1 text-sm md:order-none md:w-auto">
             {links.map((l) => {
               const active = l.href === "/app" ? pathname === "/app" : pathname.startsWith(l.href);
               return (
@@ -32,7 +32,7 @@ export function Nav() {
                   key={l.href}
                   href={l.href}
                   className={cn(
-                    "shrink-0 rounded-sm px-2.5 py-1.5 text-muted-foreground transition-colors hover:text-foreground",
+                    "shrink-0 rounded-md px-2.5 py-1.5 text-muted-foreground transition-colors hover:text-foreground",
                     active && "bg-muted text-foreground",
                   )}
                 >

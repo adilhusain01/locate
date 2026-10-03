@@ -15,18 +15,18 @@ export default function PortfolioPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Portfolio</h1>
-        <p className="mt-1 text-sm text-muted-foreground">{address ? "Your shorts, collateral and lending positions." : "Connect a wallet to see your positions."}</p>
+        <h1 className="text-4xl font-bold tracking-[-0.025em] sm:text-5xl">Portfolio</h1>
+        <p className="mt-2 text-base text-muted-foreground">{address ? "Your shorts, collateral and lending positions." : "Connect a wallet to see your positions."}</p>
       </div>
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card><CardHeader className="pb-2"><CardDescription>Collateral</CardDescription><CardTitle className="text-xl tabular-nums">{fmtUsdg(me.collateral)}</CardTitle></CardHeader><CardContent className="text-xs text-muted-foreground">Pending fees {fmtUsdg(me.pendingFees)}</CardContent></Card>
-        <Card><CardHeader className="pb-2"><CardDescription>Health</CardDescription><CardTitle className="text-xl tabular-nums">{fmtHealth(me.health)}</CardTitle></CardHeader><CardContent className="text-xs text-muted-foreground">{me.auctionStart && me.auctionStart > 0n ? "Auction open on this account" : "No auction"}</CardContent></Card>
-        <Card><CardHeader className="pb-2"><CardDescription>Open shorts</CardDescription><CardTitle className="text-xl tabular-nums">{me.borrowedTokens?.length ?? "…"}</CardTitle></CardHeader><CardContent className="text-xs text-muted-foreground">Across {markets.length} markets</CardContent></Card>
-        <Card><CardHeader className="pb-2"><CardDescription>Router</CardDescription><CardTitle className="text-xl">{me.routerApproved === undefined ? "…" : me.routerApproved ? "Approved" : "Not approved"}</CardTitle></CardHeader><CardContent className="text-xs text-muted-foreground">Operator rights for one-transaction short and cover</CardContent></Card>
+      <div className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-4">
+        <Card><CardHeader className="pb-2"><CardDescription>Collateral</CardDescription><CardTitle className="text-2xl font-bold tracking-tight tabular-nums sm:text-3xl">{fmtUsdg(me.collateral)}</CardTitle></CardHeader><CardContent className="text-xs text-muted-foreground">Pending fees {fmtUsdg(me.pendingFees)}</CardContent></Card>
+        <Card><CardHeader className="pb-2"><CardDescription>Health</CardDescription><CardTitle className="text-2xl font-bold tracking-tight tabular-nums sm:text-3xl">{fmtHealth(me.health)}</CardTitle></CardHeader><CardContent className="text-xs text-muted-foreground">{me.auctionStart && me.auctionStart > 0n ? "Auction open on this account" : "No auction"}</CardContent></Card>
+        <Card><CardHeader className="pb-2"><CardDescription>Open shorts</CardDescription><CardTitle className="text-2xl font-bold tracking-tight tabular-nums sm:text-3xl">{me.borrowedTokens?.length ?? "…"}</CardTitle></CardHeader><CardContent className="text-xs text-muted-foreground">Across {markets.length} markets</CardContent></Card>
+        <Card><CardHeader className="pb-2"><CardDescription>Router</CardDescription><CardTitle className="text-xl font-semibold">{me.routerApproved === undefined ? "…" : me.routerApproved ? "Approved" : "Not approved"}</CardTitle></CardHeader><CardContent className="text-xs text-muted-foreground">Operator rights for one-transaction short and cover</CardContent></Card>
       </div>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">Shorts</CardTitle><CardDescription>Liquidation price is where health reaches 1.00 for that position alone.</CardDescription></CardHeader>
+        <CardHeader><CardTitle className="text-xl font-semibold">Shorts</CardTitle><CardDescription>Liquidation price is where health reaches 1.00 for that position alone.</CardDescription></CardHeader>
         <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader><TableRow><TableHead>Ticker</TableHead><TableHead className="text-right">Shares owed</TableHead><TableHead className="text-right">Price</TableHead><TableHead className="text-right">Value</TableHead><TableHead className="text-right">Liquidation price</TableHead></TableRow></TableHeader>
@@ -54,7 +54,7 @@ export default function PortfolioPage() {
       </Card>
 
       <Card>
-        <CardHeader><CardTitle className="text-base">Lending</CardTitle><CardDescription>Shares in each pool, effective shares after the multiplier, and USDG waiting to be claimed.</CardDescription></CardHeader>
+        <CardHeader><CardTitle className="text-xl font-semibold">Lending</CardTitle><CardDescription>Shares in each pool, effective shares after the multiplier, and USDG waiting to be claimed.</CardDescription></CardHeader>
         <CardContent className="overflow-x-auto">
           <Table>
             <TableHeader><TableRow><TableHead>Ticker</TableHead><TableHead className="text-right">Deposited</TableHead><TableHead className="text-right">Effective shares</TableHead><TableHead className="text-right">Claimable</TableHead><TableHead></TableHead></TableRow></TableHeader>

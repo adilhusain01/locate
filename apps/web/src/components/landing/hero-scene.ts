@@ -2,6 +2,7 @@
 // function of the loop time t, so the step rail can jump anywhere and reduced motion can show still frames.
 import * as THREE from "three";
 import { CSS2DObject, CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
+import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { T } from "./tokens";
 
 export const STEP_SECONDS = 4;
@@ -74,6 +75,19 @@ function stackScale(t: number) {
   return 1;
 }
 
+// A square with rounded corners centred on the origin, half-size h and corner radius r.
+function roundRect(p: THREE.Shape | THREE.Path, h: number, r: number) {
+  p.moveTo(-h + r, -h);
+  p.lineTo(h - r, -h);
+  p.quadraticCurveTo(h, -h, h, -h + r);
+  p.lineTo(h, h - r);
+  p.quadraticCurveTo(h, h, h - r, h);
+  p.lineTo(-h + r, h);
+  p.quadraticCurveTo(-h, h, -h, h - r);
+  p.lineTo(-h, -h + r);
+  p.quadraticCurveTo(-h, -h, -h + r, -h);
+}
+
 export type SceneHandle = { setTime: (t: number) => void; setPlaying: (p: boolean) => void; dispose: () => void };
 export type SceneOptions = { onTick: (t: number) => void; labels: Record<Station, string>; playing: boolean; startAt?: number };
 
@@ -99,44 +113,36 @@ export function createScene(host: HTMLElement, opts: SceneOptions): SceneHandle 
   camera.lookAt(0, 0, 0);
 
   // Light from above and to the left-front, so cylinders shade like the flat-faced blocks.
-  scene.add(new THREE.HemisphereLight(0xffffff, 0xb8c0ca, 2.4));
-  const sun = new THREE.DirectionalLight(0xffffff, 1.1);
-  sun.position.set(4, 14, 10);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x8f9cc0, 1.9));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.5);
+  sun.position.set(3, 12, 9);
   scene.add(sun);
 
   const disposables: { dispose: () => void }[] = [];
   const keep = <D extends { dispose: () => void }>(d: D) => (disposables.push(d), d);
   const mat = (color: string) => keep(new THREE.MeshLambertMaterial({ color }));
-  const edgeMat = keep(new THREE.LineBasicMaterial({ color: T.ink, transparent: true, opacity: 0.55 }));
 
-  // Iso illustration shading: the top face is the colour, the left (+z) face a step darker, the right (+x) two.
-  const ink = new THREE.Color(T.ink);
-  const faces = (color: string, k1 = 0.07, k2 = 0.16) => {
-    const top = keep(new THREE.MeshBasicMaterial({ color }));
-    const left = keep(new THREE.MeshBasicMaterial({ color: new THREE.Color(color).lerp(ink, k1) }));
-    const right = keep(new THREE.MeshBasicMaterial({ color: new THREE.Color(color).lerp(ink, k2) }));
-    return [right, right, top, top, left, left];
-  };
-  const sheet = faces(T.paper2);
-  const plate = faces("#fbfbfa", 0.05, 0.1);
-  const greenFaces = faces(T.lend, 0.18, 0.32);
+  // Soft rounded forms, lit from above-front; each station tinted by whose it is.
+  const sheet = mat("#ffffff");
+  const plate = mat("#fdfdff");
+  const lendTint = mat(T.lendTint);
+  const shortTint = mat(T.shortTint);
+  const greenFaces = mat(T.lend);
   const cobalt = mat(T.accent);
-  const cobaltTint = faces(T.accentTint, 0.06, 0.13);
+  const cobaltTint = mat(T.accentTint);
   const ring = keep(new THREE.MeshBasicMaterial({ color: T.accent }));
 
-  function block(w: number, h: number, d: number, m: THREE.Material | THREE.Material[], at: THREE.Vector3) {
-    const geo = keep(new THREE.BoxGeometry(w, h, d));
+  function block(w: number, h: number, d: number, m: THREE.Material, at: THREE.Vector3, radius = 0.28) {
+    const geo = keep(new RoundedBoxGeometry(w, h, d, 5, Math.min(radius, h / 2 - 0.001)));
     const mesh = new THREE.Mesh(geo, m);
     mesh.position.copy(at).setY(at.y + h / 2);
-    const edges = new THREE.LineSegments(keep(new THREE.EdgesGeometry(geo)), edgeMat);
-    mesh.add(edges);
     scene.add(mesh);
     return mesh;
   }
 
   // Ground plate with a quiet one-unit grid, the drafting table everything stands on.
   const PLATE = { cx: -0.1, cz: 0.05, w: 13.4, d: 9.6 };
-  block(PLATE.w, 0.3, PLATE.d, plate, plan(PLATE.cx, PLATE.cz, -0.3));
+  block(PLATE.w, 0.3, PLATE.d, plate, plan(PLATE.cx, PLATE.cz, -0.3), 0.149);
   const grid = new THREE.GridHelper(PLATE.d, PLATE.d, T.rule, T.rule);
   grid.scale.x = PLATE.w / PLATE.d;
   grid.position.set(PLATE.cx, 0.005, PLATE.cz);
@@ -149,19 +155,23 @@ export function createScene(host: HTMLElement, opts: SceneOptions): SceneHandle 
   const at = (s: Station, y = 0) => plan(PLAN[s][0], PLAN[s][1], y);
 
   // Stations.
-  block(2.0, TOP.holder, 2.0, sheet, at("holder"));
+  block(2.0, TOP.holder, 2.0, lendTint, at("holder"));
   block(2.4, TOP.pool, 2.4, sheet, at("pool"));
   block(2.6, TOP.controller, 2.6, cobaltTint, at("controller"));
   block(2.0, TOP.trader, 2.0, sheet, at("trader"));
-  block(1.8, TOP.liquidator, 1.8, sheet, at("liquidator"));
+  block(1.8, TOP.liquidator, 1.8, shortTint, at("liquidator"));
   const dexGeo = keep(new THREE.CylinderGeometry(1.35, 1.35, TOP.dex, 48));
   const dex = new THREE.Mesh(dexGeo, mat(T.paper2));
   dex.position.copy(at("dex", TOP.dex / 2));
-  dex.add(new THREE.LineSegments(keep(new THREE.EdgesGeometry(dexGeo, 30)), edgeMat));
   scene.add(dex);
 
   // Health frame around the Controller: cobalt while healthy, short red once the auction step begins.
-  const ringMesh = new THREE.Mesh(keep(new THREE.RingGeometry(2.05, 2.25, 4, 1, Math.PI / 4)), ring);
+  const healthFrame = new THREE.Shape();
+  roundRect(healthFrame, 1.68, 0.5);
+  const hole = new THREE.Path();
+  roundRect(hole, 1.56, 0.42);
+  healthFrame.holes.push(hole);
+  const ringMesh = new THREE.Mesh(keep(new THREE.ShapeGeometry(healthFrame, 12)), ring);
   ringMesh.rotation.x = -Math.PI / 2;
   ringMesh.position.copy(at("controller", 0.02));
   scene.add(ringMesh);
@@ -195,15 +205,12 @@ export function createScene(host: HTMLElement, opts: SceneOptions): SceneHandle 
   }
 
   // Token geometry.
-  const tileGeo = keep(new THREE.BoxGeometry(0.62, 0.16, 0.62));
+  const tileGeo = keep(new RoundedBoxGeometry(0.62, 0.16, 0.62, 3, 0.07));
   const coinGeo = keep(new THREE.CylinderGeometry(0.3, 0.3, 0.12, 28));
   const dripGeo = keep(new THREE.CylinderGeometry(0.17, 0.17, 0.08, 20));
-  const tileEdges = keep(new THREE.EdgesGeometry(tileGeo));
-  const tokenEdge = keep(new THREE.LineBasicMaterial({ color: "#ffffff", transparent: true, opacity: 0.45 }));
 
   function token(kind: Kind) {
     const mesh = new THREE.Mesh(kind === "tile" ? tileGeo : kind === "coin" ? coinGeo : dripGeo, kind === "tile" ? greenFaces : cobalt);
-    if (kind === "tile") mesh.add(new THREE.LineSegments(tileEdges, tokenEdge));
     scene.add(mesh);
     return mesh;
   }

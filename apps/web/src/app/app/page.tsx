@@ -15,14 +15,14 @@ export default function MarketsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-2xl font-semibold tracking-tight">Markets</h1>
+          <h1 className="text-4xl font-bold tracking-[-0.025em] sm:text-5xl">Markets</h1>
           <p className="mt-1 max-w-2xl text-sm text-muted-foreground">
             Lend a stock token and earn its borrow fee in USDG. Borrow one against USDG to short it. Rates move with utilisation.
           </p>
         </div>
       </div>
       {error && <p className="text-sm text-destructive">Could not read the chain: {(error as Error).message.split("\n")[0]}</p>}
-      <div className="overflow-x-auto rounded-sm border">
+      <div className="overflow-x-auto rounded-xl border bg-card">
         <Table>
           <TableHeader>
             <TableRow>

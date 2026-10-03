@@ -86,25 +86,25 @@ export function Hero() {
 
   return (
     <section className="border-b">
-      <div className="mx-auto grid max-w-6xl grid-cols-[minmax(0,1fr)] gap-8 px-4 pt-10 sm:pt-14 lg:grid-cols-[minmax(0,4fr)_minmax(0,6fr)] lg:items-center lg:gap-6 lg:pt-6">
+      <div className="mx-auto grid max-w-[1440px] grid-cols-[minmax(0,1fr)] gap-8 px-5 sm:px-8 lg:px-12 pt-10 sm:pt-14 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-center lg:gap-12 lg:pt-6">
         <div className="lg:py-8">
-          <h1 className="text-balance text-[2.6rem] font-semibold leading-[1.02] tracking-[-0.035em] sm:text-6xl lg:text-[3.3rem]">
+          <h1 className="text-balance text-[2.9rem] font-bold leading-[1] tracking-[-0.018em] sm:text-7xl lg:text-[4.6rem]">
             Lend the stock you hold. Short the stock you don&apos;t.
           </h1>
-          <p className="mt-6 max-w-[34rem] text-pretty text-lg leading-relaxed text-muted-foreground">
+          <p className="mt-7 max-w-[36rem] text-pretty text-xl leading-relaxed text-muted-foreground">
             Locate is a stock lending market for Robinhood Chain stock tokens, open every hour of the week. Lenders earn the borrow fee in USDG. Shorts post USDG once and borrow any listed ticker.
           </p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <Link href="/app" className="key inline-flex h-11 items-center rounded-sm bg-primary px-5 text-sm font-medium text-primary-foreground">
+            <Link href="/app" className="key inline-flex h-12 items-center rounded-md bg-primary px-6 text-base font-medium text-primary-foreground">
               Open the app
             </Link>
-            <a href="#how" className="inline-flex h-11 items-center rounded-sm border bg-card px-5 text-sm font-medium">
+            <a href="#how" className="inline-flex h-12 items-center rounded-md border bg-card px-6 text-base font-medium">
               How it works
             </a>
           </div>
         </div>
 
-        <div className="relative -mx-4 sm:mx-0">
+        <div className="relative">
           {failed ? (
             <div className="px-4 sm:px-0"><RolesDiagram /></div>
           ) : (
@@ -112,13 +112,13 @@ export function Hero() {
               ref={host}
               role="img"
               aria-label={`Animated diagram of a Locate trade. Now showing step ${step + 1} of 5: ${STEPS[step].title}. ${STEPS[step].body}`}
-              className="relative aspect-[4/3] w-full sm:aspect-[3/2]"
+              className="hero-stage relative aspect-[4/3] w-full overflow-hidden rounded-2xl border sm:aspect-[3/2] sm:rounded-[2rem]"
             />
           )}
         </div>
       </div>
 
-      <div className="mx-auto max-w-6xl px-4 pb-10">
+      <div className="mx-auto max-w-[1440px] px-5 sm:px-8 lg:px-12 pb-10">
         <div className="flex items-start gap-3 border-t pt-4">
           <ol ref={rail} className="grid flex-1 grid-cols-5 gap-2 sm:gap-4" style={{ ["--step-progress" as string]: "0" }}>
             {STEPS.map((s, i) => {
@@ -129,11 +129,11 @@ export function Hero() {
                     type="button"
                     onClick={() => jump(i)}
                     aria-current={active ? "step" : undefined}
-                    className="group block w-full rounded-sm text-left outline-offset-4 focus-visible:outline-2 focus-visible:outline-ring"
+                    className="group block w-full rounded-md text-left outline-offset-4 focus-visible:outline-2 focus-visible:outline-ring"
                   >
-                    <span className="relative block h-0.5 overflow-hidden bg-border">
+                    <span className="relative block h-1 overflow-hidden rounded-full bg-border">
                       <span
-                        className="absolute inset-y-0 left-0 bg-primary"
+                        className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-primary to-[var(--lend)]"
                         style={{ width: active ? (playing ? "calc(var(--step-progress) * 100%)" : "100%") : i < step ? "100%" : "0%" }}
                       />
                     </span>
@@ -141,7 +141,7 @@ export function Hero() {
                       <span className="tabular text-xs">{i + 1}</span>
                       <span className="hidden truncate sm:inline">{s.title}</span>
                     </span>
-                    <span className={`mt-1 hidden text-[13px] leading-snug transition-opacity md:block ${active ? "text-foreground/80 opacity-100" : "text-muted-foreground opacity-60"}`}>{s.body}</span>
+                    <span className={`mt-1 hidden text-sm leading-snug transition-opacity md:block ${active ? "text-foreground/80 opacity-100" : "text-muted-foreground opacity-60"}`}>{s.body}</span>
                   </button>
                 </li>
               );
@@ -153,7 +153,7 @@ export function Hero() {
               onClick={toggle}
               aria-label={playing ? "Pause the animation" : "Play the animation"}
               title={reduced && !playing ? "Play (your system asks for reduced motion)" : undefined}
-              className="mt-2 inline-flex size-8 shrink-0 items-center justify-center rounded-sm border bg-card text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
+              className="mt-2 inline-flex size-9 shrink-0 items-center justify-center rounded-md border bg-card text-muted-foreground hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring"
             >
               {playing ? <PauseIcon className="size-4" aria-hidden="true" /> : <PlayIcon className="size-4" aria-hidden="true" />}
             </button>

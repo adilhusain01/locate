@@ -28,11 +28,11 @@ export default async function AuctionsPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Auctions</h1>
-        <p className="mt-1 text-sm text-muted-foreground">Accounts below health 1.00. The discount runs from 1 to 12 percent over 20 minutes. Anyone can liquidate; the flash path needs no capital.</p>
+        <h1 className="text-4xl font-bold tracking-[-0.025em] sm:text-5xl">Auctions</h1>
+        <p className="mt-2 text-base text-muted-foreground">Accounts below health 1.00. The discount runs from 1 to 12 percent over 20 minutes. Anyone can liquidate; the flash path needs no capital.</p>
       </div>
       <Card>
-        <CardHeader><CardTitle className="text-base">Open auctions</CardTitle><CardDescription>{rows === null ? "The indexer is not configured, so this list is empty here. Keepers still liquidate on-chain." : `${rows.length} open`}</CardDescription></CardHeader>
+        <CardHeader><CardTitle className="text-xl font-semibold">Open auctions</CardTitle><CardDescription>{rows === null ? "The indexer is not configured, so this list is empty here. Keepers still liquidate on-chain." : `${rows.length} open`}</CardDescription></CardHeader>
         <CardContent>
           <Table>
             <TableHeader><TableRow><TableHead>Account</TableHead><TableHead>Open since</TableHead></TableRow></TableHeader>

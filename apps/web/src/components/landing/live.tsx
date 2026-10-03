@@ -21,14 +21,14 @@ function TicketInner() {
   const m = rows?.[0];
   const updated = m?.updatedAt ? new Date(Number(m.updatedAt) * 1000) : undefined;
   return (
-    <div className="rounded-sm border bg-card p-5">
+    <div className="rounded-xl border card-wash wash-cobalt p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm text-muted-foreground">Borrow ticket</p>
-          <p className="mt-1 text-2xl font-semibold tracking-tight">{m?.ticker ?? "NVDA"}</p>
+          <p className="mt-1 font-display text-3xl font-bold tracking-tight">{m?.ticker ?? "NVDA"}</p>
         </div>
         <div className="text-right">
-          <p className="font-mono tabular text-2xl">{isLoading ? "…" : fmtUsdWad(m?.priceWad)}</p>
+          <p className="font-display tabular text-3xl font-bold tracking-tight">{isLoading ? "…" : fmtUsdWad(m?.priceWad)}</p>
           <div className="mt-1 flex justify-end">{m ? <RegimeBadge regime={m.regime} /> : <span className="text-xs text-muted-foreground">reading chain</span>}</div>
         </div>
       </div>
@@ -42,8 +42,8 @@ function TicketInner() {
         <Row label="Last print" value={updated ? updated.toUTCString().replace(" GMT", " UTC") : "…"} />
       </div>
       <div className="mt-5 flex gap-2">
-        <Link href="/app/short?ticker=NVDA" className="key inline-flex h-9 items-center rounded-sm bg-primary px-4 text-sm font-medium text-primary-foreground">Short NVDA</Link>
-        <Link href="/app/lend?ticker=NVDA" className="inline-flex h-9 items-center rounded-sm border bg-card px-4 text-sm font-medium">Lend NVDA</Link>
+        <Link href="/app/short?ticker=NVDA" className="key inline-flex h-9 items-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground">Short NVDA</Link>
+        <Link href="/app/lend?ticker=NVDA" className="inline-flex h-9 items-center rounded-md border bg-card px-4 text-sm font-medium">Lend NVDA</Link>
       </div>
       <p className="mt-3 text-xs text-muted-foreground">Live from Robinhood Chain testnet. Prices are the mainnet Chainlink prints, mirrored.</p>
     </div>
@@ -64,12 +64,12 @@ function MarketsInner() {
   const best = rows?.reduce((acc, r) => (r.supplyRateWad > acc ? r.supplyRateWad : acc), 0n);
   return (
     <div>
-      <div className="grid gap-px overflow-hidden rounded-sm border bg-border sm:grid-cols-3">
-        <div className="bg-card p-4"><p className="text-sm text-muted-foreground">Markets live</p><p className="mt-1 font-mono tabular text-2xl">{rows ? rows.length : "…"}</p><p className="mt-1 text-xs text-muted-foreground">{rows ? `${rows.filter((r) => REAL_TICKERS.has(r.ticker)).length} real faucet tokens, the rest mocks` : ""}</p></div>
-        <div className="bg-card p-4"><p className="text-sm text-muted-foreground">Lent to the pools</p><p className="mt-1 font-mono tabular text-2xl">{totalLent === undefined ? "…" : fmtUsdWad(totalLent)}</p><p className="mt-1 text-xs text-muted-foreground">at the current prints</p></div>
-        <div className="bg-card p-4"><p className="text-sm text-muted-foreground">Best supply APY right now</p><p className="mt-1 font-mono tabular text-2xl">{best === undefined ? "…" : fmtPctWad(best)}</p><p className="mt-1 text-xs text-muted-foreground">rates follow utilisation</p></div>
+      <div className="grid gap-px overflow-hidden rounded-xl border bg-border sm:grid-cols-3">
+        <div className="card-wash wash-cobalt p-5"><p className="text-sm text-muted-foreground">Markets live</p><p className="mt-1 font-display tabular text-3xl font-bold tracking-tight">{rows ? rows.length : "…"}</p><p className="mt-1 text-xs text-muted-foreground">{rows ? `${rows.filter((r) => REAL_TICKERS.has(r.ticker)).length} real faucet tokens, the rest mocks` : ""}</p></div>
+        <div className="card-wash wash-cobalt p-5"><p className="text-sm text-muted-foreground">Lent to the pools</p><p className="mt-1 font-display tabular text-3xl font-bold tracking-tight">{totalLent === undefined ? "…" : fmtUsdWad(totalLent)}</p><p className="mt-1 text-xs text-muted-foreground">at the current prints</p></div>
+        <div className="card-wash wash-cobalt p-5"><p className="text-sm text-muted-foreground">Best supply APY right now</p><p className="mt-1 font-display tabular text-3xl font-bold tracking-tight">{best === undefined ? "…" : fmtPctWad(best)}</p><p className="mt-1 text-xs text-muted-foreground">rates follow utilisation</p></div>
       </div>
-      <div className="mt-4 overflow-x-auto rounded-sm border">
+      <div className="mt-4 overflow-x-auto rounded-xl border bg-card">
         <table className="w-full min-w-[640px] text-sm">
           <thead className="bg-muted/60 text-left text-xs text-muted-foreground">
             <tr><th className="px-3 py-2 font-medium">Ticker</th><th className="px-3 py-2 text-right font-medium">Price</th><th className="px-3 py-2 font-medium">Session</th><th className="px-3 py-2 text-right font-medium">Supply APY</th><th className="px-3 py-2 text-right font-medium">Borrow APR</th><th className="px-3 py-2 text-right font-medium">Available</th></tr>
