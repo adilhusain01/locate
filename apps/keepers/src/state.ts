@@ -1,6 +1,7 @@
 // Small JSON state file per job (last scanned block, known accounts). Lives next to the run records.
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
+import { jsonSafe } from "./runlog.ts";
 
 const dir = process.env.RUNLOG_DIR ?? "runs";
 mkdirSync(dir, { recursive: true });
@@ -12,5 +13,5 @@ export function loadState<T>(job: string, fallback: T): T {
 }
 
 export function saveState<T>(job: string, state: T) {
-  writeFileSync(join(dir, `state-${job}.json`), JSON.stringify(state, null, 2));
+  writeFileSync(join(dir, `state-${job}.json`), JSON.stringify(state, jsonSafe, 2));
 }

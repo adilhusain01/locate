@@ -15,8 +15,13 @@ export type RunRecord = {
   failures: { input: unknown; error: string }[];
 };
 
+// viem hands back bigint answers, block numbers and nonces; JSON.stringify refuses them, so they go out as strings.
+export function jsonSafe(_key: string, value: unknown) {
+  return typeof value === "bigint" ? value.toString() : value;
+}
+
 export function writeRun(record: RunRecord) {
-  appendFileSync(join(dir, `${record.job}.jsonl`), JSON.stringify(record) + "\n");
+  appendFileSync(join(dir, `${record.job}.jsonl`), JSON.stringify(record, jsonSafe) + "\n");
 }
 
 export async function run<T>(job: string, body: (fail: (input: unknown, error: unknown) => void) => Promise<T>) {
@@ -35,5 +40,5 @@ export async function run<T>(job: string, body: (fail: (input: unknown, error: u
   }
   writeRun({ job, startedAt, finishedAt: new Date().toISOString(), ok: ok && failures.length === 0, summary, failures });
   const status = ok && failures.length === 0 ? "ok" : "FAILED";
-  console.log(`[${job}] ${status} ${JSON.stringify(summary)}${failures.length ? ` failures=${failures.length}` : ""}`);
+  console.log(`[${job}] ${status} ${JSON.stringify(summary, jsonSafe)}${failures.length ? ` failures=${failures.length}` : ""}`);
 }
