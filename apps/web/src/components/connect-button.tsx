@@ -1,10 +1,29 @@
 "use client";
 
 import { useAccount, useConnect, useDisconnect, useSwitchChain } from "wagmi";
-import { Button } from "@/components/ui/button";
+import Link from "next/link";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { chain, privyAppId } from "@/lib/wagmi";
 import { shortAddress } from "@/lib/format";
 import { useLogin, useLogout, usePrivy } from "@privy-io/react-auth";
+import { CopyAddress } from "./copy-address";
+import { NetworkCard } from "./network-card";
+
+// The account side of the top bar: positions, copy the address, and the address itself (click to leave).
+function WalletCluster({ address, onLeave, leaveHint }: { address: string; onLeave: () => void; leaveHint: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <Link href="/app/portfolio" className={cn(buttonVariants({ variant: "outline" }), "hidden sm:inline-flex")}>
+        Portfolio
+      </Link>
+      <CopyAddress address={address} />
+      <Button variant="outline" onClick={onLeave} title={`${address} (${leaveHint})`}>
+        {shortAddress(address)}
+      </Button>
+    </div>
+  );
+}
 
 function PrivyConnect() {
   const { ready, authenticated } = usePrivy();
@@ -16,9 +35,7 @@ function PrivyConnect() {
   if (!authenticated || !address) return <Button onClick={() => login()}>Sign in</Button>;
   if (chainId !== chain.id) return <Button variant="outline" onClick={() => switchChain({ chainId: chain.id })}>Switch to Robinhood testnet</Button>;
   return (
-    <Button variant="outline" onClick={() => logout()} title={address}>
-      {shortAddress(address)}
-    </Button>
+    <WalletCluster address={address} onLeave={() => logout()} leaveHint="sign out" />
   );
 }
 
@@ -36,12 +53,15 @@ function InjectedConnect() {
   }
   if (chainId !== chain.id) return <Button variant="outline" onClick={() => switchChain({ chainId: chain.id })}>Switch to Robinhood testnet</Button>;
   return (
-    <Button variant="outline" onClick={() => disconnect()} title={address}>
-      {shortAddress(address)}
-    </Button>
+    <WalletCluster address={address} onLeave={() => disconnect()} leaveHint="disconnect" />
   );
 }
 
 export function ConnectButton() {
-  return privyAppId ? <PrivyConnect /> : <InjectedConnect />;
+  return (
+    <div className="flex items-center gap-2">
+      <NetworkCard />
+      {privyAppId ? <PrivyConnect /> : <InjectedConnect />}
+    </div>
+  );
 }
