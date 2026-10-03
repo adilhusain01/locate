@@ -2,7 +2,7 @@
 
 Locate is an on-chain stock lending and borrowing market for tokenized stocks, built first for Robinhood Chain Stock Tokens. Holders lend tokens they already own and earn a fee in USDG. Borrowers post USDG collateral and take tokens to short, hedge, market-make or arbitrage. The protocol is non-custodial and has no token.
 
-Status: live on Robinhood Chain testnet (chain id 46630) since 2 October 2026 with 14 markets, nine mocks and five real faucet Stock Tokens, and mirrored on Arbitrum Sepolia. App: https://locate-pi.vercel.app. Addresses in `docs/deployments.md`. Mainnet is read-only (fork tests and the price mirror).
+Status: live on Robinhood Chain testnet (chain id 46630) since 2 October 2026 with 14 markets, nine mocks and five real faucet Stock Tokens, and mirrored on Arbitrum Sepolia. App: https://locate-pi.vercel.app (landing at `/`, the app at `/app`). Indexer: https://locate-indexer.adilhusain.xyz (GraphQL at `/graphql`, borrow rates at `/markets`). Addresses and verification state in `docs/deployments.md`. Mainnet is read-only (fork tests and the price mirror).
 
 ## How it works
 

@@ -89,3 +89,8 @@ Mirror of the Robinhood testnet stack with the nine mock markets (the faucet Sto
 | GME | `0x517D941354B2773852ba4aEb3b6d3bAF600EC415` | `0x45df8Dc662f077B5FC0bb79869a90e22931c99a0` | `0xC1EF6A0B2cd377CcC297137c7c7c866dfdcb182D` | `0x91619735469340561b2dAff5fa4586AF2EAD5161` |
 | COIN | `0xC474ee853c670ceed78F782D0BB8AedabF464f4a` | `0x8B13487833c166d2bb318cec8a0771E882f67616` | `0xEDC25367AF422414cD79CF1f4AF79c3B3b373640` | `0xd0d5Bf1154680905c0B739Fdb050752cabDED824` |
 | MSTR | `0x4A529e4cE2624c722ACAB1d7d1106397C3daccc6` | `0xD17B058649f3aa92b3ea91280C2BCAEA40b63cD7` | `0x8AFb6342DCc92568CeCAf4F2E38D20a7E87b0e4B` | `0x88F054cB9F2de5bc3bc096330A75Ac9FDFc9F837` |
+
+## Source verification (checked 2026-10-03)
+
+- Robinhood Chain testnet: every Locate Solidity contract is verified on the Blockscout explorer. Not verified there: the vendored Uniswap v3 factory and router (upstream bytecode, not Locate source) and the three Stylus contracts, whose Rust source is in `stylus/` and reproduces with `cargo stylus check`.
+- Arbitrum Sepolia: every Locate contract is verified, on Blockscout or (the Liquidator, after Blockscout rate-limited the request) on Sourcify, which Blockscout reads. The vendored Uniswap contracts are not.
