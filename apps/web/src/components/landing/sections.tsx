@@ -14,8 +14,17 @@ export function Section({ id, title, lead, children }: { id: string; title: stri
   );
 }
 
-export function Prose({ children }: { children: React.ReactNode }) {
-  return <div className="max-w-prose space-y-4 text-[15px] leading-relaxed">{children}</div>;
+// The long-form mechanics stay one click away so the diagrams carry the page.
+export function Details({ children, summary = "Read the mechanics" }: { children: React.ReactNode; summary?: string }) {
+  return (
+    <details className="group mt-6 max-w-prose rounded-sm border bg-card">
+      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-4 py-3 text-sm font-medium outline-offset-2 focus-visible:outline-2 focus-visible:outline-ring [&::-webkit-details-marker]:hidden">
+        {summary}
+        <svg aria-hidden="true" viewBox="0 0 16 16" className="size-4 text-muted-foreground transition-transform duration-200 ease-out group-open:rotate-180"><path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" strokeWidth="1.5" /></svg>
+      </summary>
+      <div className="space-y-4 border-t px-4 py-4 text-[15px] leading-relaxed">{children}</div>
+    </details>
+  );
 }
 
 export function Header() {
