@@ -1,7 +1,6 @@
 // Isometric Three.js scene for the landing hero: one short trade, looped. Everything on screen is a pure
 // function of the loop time t, so the step rail can jump anywhere and reduced motion can show still frames.
 import * as THREE from "three";
-import { CSS2DObject, CSS2DRenderer } from "three/examples/jsm/renderers/CSS2DRenderer.js";
 import { RoundedBoxGeometry } from "three/examples/jsm/geometries/RoundedBoxGeometry.js";
 import { T } from "./tokens";
 
@@ -89,7 +88,8 @@ function roundRect(p: THREE.Shape | THREE.Path, h: number, r: number) {
 }
 
 export type SceneHandle = { setTime: (t: number) => void; setPlaying: (p: boolean) => void; dispose: () => void };
-export type SceneOptions = { onTick: (t: number) => void; labels: Record<Station, string>; playing: boolean; startAt?: number };
+export type Callout = { name: string; role: string };
+export type SceneOptions = { onTick: (t: number) => void; labels: Record<Station, Callout>; playing: boolean; startAt?: number };
 
 export function createScene(host: HTMLElement, opts: SceneOptions): SceneHandle {
   const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, powerPreference: "low-power" });
@@ -101,11 +101,14 @@ export function createScene(host: HTMLElement, opts: SceneOptions): SceneHandle 
   renderer.domElement.style.inset = "0";
   host.appendChild(renderer.domElement);
 
-  const labelRenderer = new CSS2DRenderer();
-  labelRenderer.domElement.style.position = "absolute";
-  labelRenderer.domElement.style.inset = "0";
-  labelRenderer.domElement.style.pointerEvents = "none";
-  host.appendChild(labelRenderer.domElement);
+  // Callouts live in an overlay: labels in the stage margins, leader lines in an SVG, nothing drawn on the blocks.
+  const overlay = document.createElement("div");
+  overlay.className = "hero-callouts";
+  const svgNS = "http://www.w3.org/2000/svg";
+  const svg = document.createElementNS(svgNS, "svg");
+  svg.setAttribute("aria-hidden", "true");
+  overlay.appendChild(svg);
+  host.appendChild(overlay);
 
   const scene = new THREE.Scene();
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 200);
@@ -241,26 +244,72 @@ export function createScene(host: HTMLElement, opts: SceneOptions): SceneHandle 
 
   const movers = MOVES.map((m) => ({ m, mesh: token(m.kind) }));
 
-  // Labels.
-  const labelEls: HTMLElement[] = [];
-  for (const s of Object.keys(PLAN) as Station[]) {
-    const el = document.createElement("div");
-    el.textContent = opts.labels[s];
-    el.className = "hero-label";
-    labelEls.push(el);
-    const obj = new CSS2DObject(el);
-    // Hang each label just below the station's front corner on screen.
-    const [a, b] = PLAN[s];
-    const half = s === "dex" ? 1.0 : s === "controller" ? 1.55 : s === "pool" ? 1.3 : 1.1;
-    if (s === "liquidator") {
-      // Behind the margin block on screen, so its label sits above the station's back corner instead.
-      obj.position.copy(plan(a - 0.9, b - 0.9, TOP.liquidator));
-      obj.center.set(0.5, 1.5);
-    } else {
-      obj.position.copy(plan(a + half, b + half, 0.02));
-      obj.center.set(0.5, -0.35);
+  // Callouts. Each points at one visible spot on its station and sits on the side of the stage nearest it.
+  type Side = "left" | "right" | "top" | "bottom";
+  const CALLOUT: Record<Station, { side: Side; anchor: [number, number, number]; dy?: number; align?: "start" | "end" }> = {
+    holder: { side: "left", anchor: [-0.55, TOP.holder, 0.55], dy: -0.2 },
+    trader: { side: "left", anchor: [-0.6, TOP.trader, 0.6], dy: 0.12 },
+    pool: { side: "top", anchor: [-0.95, TOP.pool, 0.15], align: "end" },
+    liquidator: { side: "top", anchor: [-0.45, TOP.liquidator, -0.45], align: "start" },
+    dex: { side: "right", anchor: [0.85, TOP.dex, -0.85], dy: -0.2 },
+    controller: { side: "bottom", anchor: [1.3, TOP.controller * 0.5, 1.3] },
+  };
+  const stations = Object.keys(PLAN) as Station[];
+  const callouts = stations.map((s) => {
+    const label = document.createElement("div");
+    label.className = "hero-callout";
+    const name = document.createElement("strong");
+    name.textContent = opts.labels[s].name;
+    const role = document.createElement("span");
+    role.textContent = opts.labels[s].role;
+    label.append(name, role);
+    overlay.appendChild(label);
+    const path = document.createElementNS(svgNS, "path");
+    const dot = document.createElementNS(svgNS, "circle");
+    dot.setAttribute("r", "3.5");
+    svg.append(path, dot);
+    return { s, label, path, dot };
+  });
+
+  function layoutCallouts(w: number, h: number) {
+    overlay.dataset.compact = w < 560 ? "true" : "false";
+    svg.setAttribute("viewBox", `0 0 ${w} ${h}`);
+    const pad = w < 560 ? 10 : 18;
+    const r = 8;
+    const v = new THREE.Vector3();
+    for (const c of callouts) {
+      const cfg = CALLOUT[c.s];
+      const [a, b] = PLAN[c.s];
+      v.set(a + cfg.anchor[0], cfg.anchor[1], b + cfg.anchor[2]).project(camera);
+      const ax = ((v.x + 1) / 2) * w;
+      const ay = ((1 - v.y) / 2) * h;
+      const lw = c.label.offsetWidth;
+      const lh = c.label.offsetHeight;
+      let lx = 0, ly = 0, d = "";
+      if (cfg.side === "left" || cfg.side === "right") {
+        ly = Math.min(h - pad - lh, Math.max(pad, ay + (cfg.dy ?? 0) * h - lh / 2));
+        lx = cfg.side === "left" ? pad : w - pad - lw;
+        const sx = cfg.side === "left" ? lx + lw : lx;
+        const sy = ly + lh / 2;
+        const dx = Math.sign(ax - sx) || 1;
+        const dyy = Math.sign(ay - sy) || 1;
+        d = Math.abs(ay - sy) < r * 2
+          ? `M${sx} ${sy} L${ax} ${ay}`
+          : `M${sx} ${sy} L${ax - dx * r} ${sy} Q${ax} ${sy} ${ax} ${sy + dyy * r} L${ax} ${ay}`;
+      } else {
+        // Neighbouring top labels hang away from each other: one ends at its anchor, the other starts there.
+        const want = cfg.align === "end" ? ax - lw + 14 : cfg.align === "start" ? ax - 14 : ax - lw / 2;
+        lx = Math.min(w - pad - lw, Math.max(pad, want));
+        ly = cfg.side === "top" ? pad : h - pad - lh;
+        const sx = Math.min(lx + lw - r, Math.max(lx + r, ax));
+        const sy = cfg.side === "top" ? ly + lh : ly;
+        d = sx === ax ? `M${sx} ${sy} L${ax} ${ay}` : `M${sx} ${sy} L${sx} ${(sy + ay) / 2} L${ax} ${(sy + ay) / 2} L${ax} ${ay}`;
+      }
+      c.label.style.transform = `translate(${Math.round(lx)}px, ${Math.round(ly)}px)`;
+      c.path.setAttribute("d", d);
+      c.dot.setAttribute("cx", String(ax));
+      c.dot.setAttribute("cy", String(ay));
     }
-    scene.add(obj);
   }
 
   function waypoints(m: Move) {
@@ -316,7 +365,12 @@ export function createScene(host: HTMLElement, opts: SceneOptions): SceneHandle 
     ripple.scale.setScalar(1 + 1.6 * clamp01(rp));
     const step = Math.min(STEPS - 1, Math.floor(t / S));
     const active: Station[][] = [["holder", "pool"], ["trader", "controller"], ["pool", "controller", "dex"], ["controller", "pool", "holder"], ["controller", "liquidator", "pool"]];
-    (Object.keys(PLAN) as Station[]).forEach((s, i) => labelEls[i].classList.toggle("is-active", active[step].includes(s)));
+    for (const c of callouts) {
+      const on = active[step].includes(c.s);
+      c.label.classList.toggle("is-active", on);
+      c.path.classList.toggle("is-active", on);
+      c.dot.classList.toggle("is-active", on);
+    }
   }
 
   function resize() {
@@ -326,7 +380,6 @@ export function createScene(host: HTMLElement, opts: SceneOptions): SceneHandle 
     renderer.setSize(w, h, false);
     renderer.domElement.style.width = `${w}px`;
     renderer.domElement.style.height = `${h}px`;
-    labelRenderer.setSize(w, h);
     // Fit the plate's projected corners (plus headroom for stacks and hops) with a small margin.
     const centre = new THREE.Vector3(PLATE.cx, 0, PLATE.cz);
     camera.position.copy(centre).add(new THREE.Vector3(30, 30, 30));
@@ -340,14 +393,15 @@ export function createScene(host: HTMLElement, opts: SceneOptions): SceneHandle 
           v.set(x, y, z).applyMatrix4(camera.matrixWorldInverse);
           minX = Math.min(minX, v.x); maxX = Math.max(maxX, v.x); minY = Math.min(minY, v.y); maxY = Math.max(maxY, v.y);
         }
-    const pad = 0.3;
-    let halfW = (maxX - minX) / 2 + pad;
-    let halfH = (maxY - minY) / 2 + pad;
+    // Extra room around the plate so the callouts sit in clear margins.
+    let halfW = ((maxX - minX) / 2) * 1.16;
+    let halfH = ((maxY - minY) / 2) * 1.2;
     const aspect = w / h;
     if (halfW / halfH < aspect) halfW = halfH * aspect; else halfH = halfW / aspect;
     const cx = (minX + maxX) / 2, cy = (minY + maxY) / 2;
     camera.left = cx - halfW; camera.right = cx + halfW; camera.top = cy + halfH; camera.bottom = cy - halfH;
     camera.updateProjectionMatrix();
+    layoutCallouts(w, h);
     draw();
   }
 
@@ -360,7 +414,6 @@ export function createScene(host: HTMLElement, opts: SceneOptions): SceneHandle 
   function draw() {
     place(t);
     renderer.render(scene, camera);
-    labelRenderer.render(scene, camera);
   }
 
   function frame(now: number) {
@@ -390,6 +443,8 @@ export function createScene(host: HTMLElement, opts: SceneOptions): SceneHandle 
   const onVis = () => kick();
   document.addEventListener("visibilitychange", onVis);
   resize();
+  // Callout widths depend on the web font; lay them out again once it has loaded.
+  document.fonts?.ready.then(() => resize()).catch(() => {});
   opts.onTick(t);
   kick();
 
@@ -411,7 +466,7 @@ export function createScene(host: HTMLElement, opts: SceneOptions): SceneHandle 
       disposables.forEach((d) => d.dispose());
       renderer.dispose();
       renderer.domElement.remove();
-      labelRenderer.domElement.remove();
+      overlay.remove();
     },
   };
 }

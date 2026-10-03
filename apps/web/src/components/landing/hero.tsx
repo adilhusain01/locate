@@ -24,7 +24,14 @@ const subscribeReduced = (cb: () => void) => {
   return () => mq.removeEventListener("change", cb);
 };
 
-const LABELS = { holder: "Holders", pool: "NVDA pool", controller: "Margin account", dex: "Uniswap", trader: "Trader", liquidator: "Liquidator" };
+const LABELS = {
+  holder: { name: "Holders", role: "lend NVDA, earn USDG" },
+  pool: { name: "NVDA pool", role: "one vault per ticker" },
+  controller: { name: "Margin account", role: "USDG backs every borrow" },
+  dex: { name: "Uniswap", role: "where borrowed shares sell" },
+  trader: { name: "Trader", role: "posts USDG, goes short" },
+  liquidator: { name: "Liquidator", role: "repays below health 1" },
+};
 
 export function Hero() {
   const host = useRef<HTMLDivElement>(null);
