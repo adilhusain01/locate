@@ -128,9 +128,9 @@ export function createScene(host: HTMLElement, opts: SceneOptions): SceneHandle 
   const lendTint = mat(T.lendTint);
   const shortTint = mat(T.shortTint);
   const greenFaces = mat(T.lend);
-  const cobalt = mat(T.accent);
+  const cobalt = mat(T.usdg);
   const cobaltTint = mat(T.accentTint);
-  const ring = keep(new THREE.MeshBasicMaterial({ color: T.accent }));
+  const ring = keep(new THREE.MeshBasicMaterial({ color: T.lend }));
 
   function block(w: number, h: number, d: number, m: THREE.Material, at: THREE.Vector3, radius = 0.28) {
     const geo = keep(new RoundedBoxGeometry(w, h, d, 5, Math.min(radius, h / 2 - 0.001)));
@@ -165,7 +165,7 @@ export function createScene(host: HTMLElement, opts: SceneOptions): SceneHandle 
   dex.position.copy(at("dex", TOP.dex / 2));
   scene.add(dex);
 
-  // Health frame around the Controller: cobalt while healthy, short red once the auction step begins.
+  // Health frame around the Controller: mint while healthy, orange-red once the auction step begins.
   const healthFrame = new THREE.Shape();
   roundRect(healthFrame, 1.68, 0.5);
   const hole = new THREE.Path();
@@ -175,7 +175,7 @@ export function createScene(host: HTMLElement, opts: SceneOptions): SceneHandle 
   ringMesh.rotation.x = -Math.PI / 2;
   ringMesh.position.copy(at("controller", 0.02));
   scene.add(ringMesh);
-  const healthy = new THREE.Color(T.accent);
+  const healthy = new THREE.Color(T.lend);
   const unhealthy = new THREE.Color(T.short);
 
   // Swap ripple on the Uniswap basin.

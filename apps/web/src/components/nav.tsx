@@ -23,7 +23,6 @@ export function Nav() {
           <Link href="/" className="shrink-0 font-display text-lg font-bold tracking-tight">
             Locate
           </Link>
-          <span className="hidden text-xs text-muted-foreground sm:inline">Robinhood Chain testnet</span>
           <nav className="order-last -mx-1 flex w-full gap-1 overflow-x-auto px-1 text-sm md:order-none md:w-auto">
             {links.map((l) => {
               const active = l.href === "/app" ? pathname === "/app" : pathname.startsWith(l.href);

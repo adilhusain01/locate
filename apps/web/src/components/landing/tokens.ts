@@ -1,17 +1,18 @@
 /// Diagram and ticket tokens, the same values as globals.css. Diagrams use at most two accent elements each.
 export const T = {
-  paper: "#f3f5fb",
+  paper: "#f6f5f7",
   paper2: "#ffffff",
   ink: "#0e1530",
-  muted: "#556079",
-  soft: "#8a93a8",
-  rule: "#dbe1ee",
-  accent: "#3050e6",
-  accentTint: "#e6ebff",
+  muted: "#5f5a6b",
+  soft: "#9a93a3",
+  rule: "#e6dfe3",
+  accent: "#e0313f",
+  accentTint: "#ffe8e9",
   lend: "#0b8f69",
   lendTint: "#dff5ec",
-  short: "#e2553f",
-  shortTint: "#fde8e2",
+  short: "#ea5a2a",
+  shortTint: "#ffeadf",
+  usdg: "#1f2a4d",
 } as const;
 
 /// Orthogonal connector, horizontal first, with a rounded elbow (r = 8).

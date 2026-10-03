@@ -133,7 +133,7 @@ export function Hero() {
                   >
                     <span className="relative block h-1 overflow-hidden rounded-full bg-border">
                       <span
-                        className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-primary to-[var(--lend)]"
+                        className="absolute inset-y-0 left-0 rounded-full bg-gradient-to-r from-[var(--primary-2)] to-primary"
                         style={{ width: active ? (playing ? "calc(var(--step-progress) * 100%)" : "100%") : i < step ? "100%" : "0%" }}
                       />
                     </span>
