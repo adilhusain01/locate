@@ -12,6 +12,8 @@ The first on-chain stock lending and borrowing market for Robinhood Chain stock 
 
 ## Project detail
 
+A tighter, form-ready version of this section lives in `docs/description.md`.
+
 **The gap.** Robinhood Chain stock tokens trade around the clock, but there is no way to go short on-chain and the float earns nothing. Sunday 30 August 2026 alone saw 270 million dollars of stock token volume with no borrow side at all. Robinhood's own off-chain Stock Lending pays customers up to 15 percent of gross revenue and excludes fractional shares.
 
 **What Locate does.** Lenders deposit a stock token into an ERC-4626 pool and earn the borrow fee in USDG while keeping the price, the splits and the dividends. Borrowers post USDG into one account and borrow any listed ticker against it; a one-transaction short borrows, sells on Uniswap v3 and counts the proceeds as margin, the way a brokerage does. Covering buys back and repays in one transaction. Liquidations are Dutch auctions with a capital-free flash path funded by the pool's own flash loans. Every market publishes its borrow rate: the first on-chain borrow rate for equities.
@@ -38,7 +40,7 @@ Solidity, Rust, Stylus, Foundry, OpenZeppelin, ERC-4626, ERC-8056, ERC-3156, Cha
 ## Links
 
 - Live app: https://locate-pi.vercel.app
-- Repository: https://github.com/adilhusain01/locate (make it public before submitting; judges need the code)
+- Repository: https://github.com/adilhusain01/locate (public)
 - Demo video: TO ADD (YouTube link)
 - Pitch video: same as the demo, or TO ADD
 - Deployments: https://github.com/adilhusain01/locate/blob/main/docs/deployments.md
@@ -93,4 +95,4 @@ Deployer and protocol owner on both testnets: 0x610FdB41DA83138615C317c89fd9EB09
 
 ## Additions
 
-Public borrow-rate feed from the indexer once hosted; threat model and self-audit checklist in `docs/threat-model.md`; the full plan with the day-by-day record in `docs/plan.md`.
+Public borrow-rate feed from the indexer at https://locate-indexer.adilhusain.xyz/markets; threat model and self-audit checklist in `docs/threat-model.md`; the full plan with the day-by-day record in `docs/plan.md`.
